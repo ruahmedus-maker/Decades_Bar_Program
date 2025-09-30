@@ -581,7 +581,7 @@
             opacity: 1;
         }
     
-                /* Cocktail Recipe Styles */
+                /* Cocktail Recipe Styles - CLEAN VERSION */
         #cocktails .cocktail-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -594,7 +594,6 @@
             padding: 20px;
             border-radius: 8px;
             border-left: 4px solid var(--accent);
-            margin-bottom: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -651,7 +650,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* FIX: Ensure ONLY cocktail section card headers are styled */
+        /* Card headers for cocktail section only */
         #cocktails .card .card-header {
             background-color: var(--primary);
             color: white;
@@ -661,23 +660,36 @@
         #cocktails .card .card-header h4 {
             color: white;
             margin: 0;
+            font-size: 1.2rem;
         }
 
-        /* FIX: Remove underline from ALL cocktail cards initially */
-        #cocktails .card .card-header h4::after {
-            display: none;
+        /* Special underline ONLY for Decades Summer Cocktails */
+        #cocktails .card:last-child .card-header h4 {
+            position: relative;
+            display: inline-block;
         }
 
-        /* FIX: Apply underline ONLY to Decades Summer Cocktails using a specific class */
-        #cocktails .card.decades-summer .card-header h4::after {
-            display: block;
+        #cocktails .card:last-child .card-header h4::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: -8px;
             left: 0;
-            width: 50px;
-            height: 2px;
+            width: 60px;
+            height: 3px;
             background: var(--accent);
+            border-radius: 2px;
+        }
+
+        /* Responsive adjustments for cocktails */
+        @media (max-width: 768px) {
+            #cocktails .cocktail-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            #cocktails .cocktail-card {
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -1156,7 +1168,7 @@
                 <!-- Red Bull & Energy Drinks -->
                 <div class="card" style="margin-bottom: 25px;">
                     <div class="card-header">
-                        <h4>Red Bull & Energy Drinks</h4>
+                        <h4>Red Bull Drinks & Bombs</h4>
                     </div>
                     <div class="card-body">
                         <div class="cocktail-grid">
@@ -1229,7 +1241,7 @@
                 <!-- Shooters & Shots -->
                 <div class="card" style="margin-bottom: 25px;">
                     <div class="card-header">
-                        <h4>Shooters & Shots</h4>
+                        <h4>Shooters</h4>
                     </div>
                     <div class="card-body">
                         <div class="cocktail-grid">
@@ -1359,7 +1371,7 @@
                 <!-- Tropical & Rum Drinks -->
                 <div class="card">
                     <div class="card-header">
-                        <h4>Tropical & Rum Drinks</h4>
+                        <h4>Tropical Drinks</h4>
                     </div>
                     <div class="card-body">
                         <div class="cocktail-grid">
@@ -1437,7 +1449,7 @@
             </div>
 
                 <!-- Decades Summer Cocktails -->
-                <div class="card decades-summer" style="margin-bottom: 25px;">
+                <div class="card">
                     <div class="card-header">
                         <h4>Decades Summer Cocktails</h4>
                     </div>
