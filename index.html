@@ -1121,340 +1121,362 @@
     <div class="toast" id="toast">Acknowledgement submitted successfully!</div>
     
     <script>
-        // Navigation functionality
-        document.querySelectorAll('.nav-links li').forEach(item => {
-            item.addEventListener('click', function() {
-                // Remove active class from all nav items
-                document.querySelectorAll('.nav-links li').forEach(li => {
-                    li.classList.remove('active');
-                });
-                
-                // Add active class to clicked nav item
-                this.classList.add('active');
-                
-                // Hide all sections
-                document.querySelectorAll('.section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                
-                // Show the target section
-                const targetId = this.getAttribute('data-target');
-                document.getElementById(targetId).classList.add('active');
-                
-                // Update page title
-                document.getElementById('page-title').textContent = this.querySelector('a').textContent.trim();
-            });
-        });
-        
-        // FAQ toggle functionality
-        document.querySelectorAll('.faq-question').forEach(question => {
-            question.addEventListener('click', function() {
-                const faqItem = this.parentElement;
-                faqItem.classList.toggle('active');
-            });
-        });
-        
-        // Progress tracking
-        const acknowledgementCheckbox = document.getElementById('acknowledgement');
-        const submitBtn = document.getElementById('submit-btn');
-        const progressFill = document.getElementById('progress-fill');
-        const progressText = document.getElementById('progress-text');
-        const toast = document.getElementById('toast');
-        
-        // Calculate initial progress based on visited sections
-        function calculateProgress() {
-            const sections = document.querySelectorAll('.section');
-            let visitedCount = 0;
-            
-            sections.forEach(section => {
-                if (section.classList.contains('visited')) {
-                    visitedCount++;
-                }
-            });
-            
-            const progress = Math.round((visitedCount / sections.length) * 100);
-            progressFill.style.width = `${progress}%`;
-            progressText.textContent = `${progress}% Complete`;
-            
-            return progress;
-        }
-        
-        // Mark sections as visited when they're viewed
-        document.querySelectorAll('.nav-links li').forEach(item => {
-            item.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-target');
-                const targetSection = document.getElementById(targetId);
-                
-                if (!targetSection.classList.contains('visited')) {
-                    targetSection.classList.add('visited');
+                // Navigation functionality
+                    document.querySelectorAll('.nav-links li').forEach(item => {
+                        item.addEventListener('click', function () {
+                            // Remove active class from all nav items
+                            document.querySelectorAll('.nav-links li').forEach(li => {
+                                li.classList.remove('active');
+                            });
+
+                            // Add active class to clicked nav item
+                            this.classList.add('active');
+
+                            // Hide all sections
+                            document.querySelectorAll('.section').forEach(section => {
+                                section.classList.remove('active');
+                            });
+
+                            // Show the target section
+                            const targetId = this.getAttribute('data-target');
+                            document.getElementById(targetId).classList.add('active');
+
+                            // Update page title
+                            document.getElementById('page-title').textContent = this.querySelector('a').textContent.trim();
+                        });
+                    });
+
+                    // FAQ toggle functionality
+                    document.querySelectorAll('.faq-question').forEach(question => {
+                        question.addEventListener('click', function () {
+                            const faqItem = this.parentElement;
+                            faqItem.classList.toggle('active');
+                        });
+                    });
+
+                    // Progress tracking
+                    const acknowledgementCheckbox = document.getElementById('acknowledgement');
+                    const submitBtn = document.getElementById('submit-btn');
+                    const progressFill = document.getElementById('progress-fill');
+                    const progressText = document.getElementById('progress-text');
+                    const toast = document.getElementById('toast');
+
+                    // Calculate initial progress based on visited sections
+                    function calculateProgress() {
+                        const sections = document.querySelectorAll('.section');
+                        let visitedCount = 0;
+
+                        sections.forEach(section => {
+                            if (section.classList.contains('visited')) {
+                                visitedCount++;
+                            }
+                        });
+
+                        const progress = Math.round((visitedCount / sections.length) * 100);
+                        progressFill.style.width = `${progress}%`;
+                        progressText.textContent = `${progress}% Complete`;
+
+                        return progress;
+                    }
+
+                    // Mark sections as visited when they're viewed
+                    document.querySelectorAll('.nav-links li').forEach(item => {
+                        item.addEventListener('click', function () {
+                            const targetId = this.getAttribute('data-target');
+                            const targetSection = document.getElementById(targetId);
+
+                            if (!targetSection.classList.contains('visited')) {
+                                targetSection.classList.add('visited');
+                                calculateProgress();
+                            }
+                        });
+                    });
+
+                    // Submit acknowledgement
+                    submitBtn.addEventListener('click', function () {
+                        if (acknowledgementCheckbox.checked) {
+                            // Show success message
+                            toast.classList.add('show');
+
+                            // Update progress to 100%
+                            progressFill.style.width = '100%';
+                            progressText.textContent = '100% Complete';
+
+                            // Disable the button
+                            submitBtn.disabled = true;
+                            submitBtn.textContent = 'Acknowledgement Submitted';
+                            submitBtn.style.backgroundColor = '#a0aec0';
+
+                            // Hide toast after 3 seconds
+                            setTimeout(() => {
+                                toast.classList.remove('show');
+                            }, 3000);
+                        } else {
+                            alert('Please check the acknowledgement box before submitting.');
+                        }
+                    });
+
+                    // Initialize progress
+                    document.getElementById('welcome').classList.add('visited');
                     calculateProgress();
-                }
-            });
-        });
-        
-        
-        // Submit acknowledgement
-        submitBtn.addEventListener('click', function() {
-            if (acknowledgementCheckbox.checked) {
-                // Show success message
-                toast.classList.add('show');
-                
-                // Update progress to 100%
-                progressFill.style.width = '100%';
-                progressText.textContent = '100% Complete';
-                
-                // Disable the button
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Acknowledgement Submitted';
-                submitBtn.style.backgroundColor = '#a0aec0';
-                
-                // Hide toast after 3 seconds
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 3000);
-            } else {
-                alert('Please check the acknowledgement box before submitting.');
-            }
-        });
-        
-        // Initialize progress
-        document.getElementById('welcome').classList.add('visited');
-        calculateProgress();  
-        
-        // Modal functionality
-            const loginModal = document.getElementById('loginModal');
-            const openLoginBtn = document.getElementById('login-btn');
-            const closeModalBtn = document.querySelector('.close-modal');
-            const cancelModalBtn = document.getElementById('modal-cancel-btn');
-            const modalLoginBtn = document.getElementById('modal-login-btn');
 
-            // Open modal when login button is clicked
-            openLoginBtn.addEventListener('click', function () {
-                loginModal.style.display = 'block';
-            });
+                    // ========== LOGIN & REGISTRATION SYSTEM ==========
 
-            // Close modal functions
-            closeModalBtn.addEventListener('click', closeModal);
-            cancelModalBtn.addEventListener('click', closeModal);
+                    // Registration System Variables
+                    const loginModal = document.getElementById('loginModal');
+                    const registerModal = document.getElementById('registerModal');
+                    const openLoginBtn = document.getElementById('login-btn');
+                    const closeModalBtns = document.querySelectorAll('.close-modal');
+                    const cancelModalBtns = document.querySelectorAll('.btn-secondary');
+                    const modalLoginBtn = document.getElementById('modal-login-btn');
+                    const registerSubmitBtn = document.getElementById('register-submit-btn');
+                    const showRegisterLink = document.getElementById('show-register');
+                    const logoutBtn = document.getElementById('logout-btn');
 
-            // Close modal when clicking outside
-            window.addEventListener('click', function (event) {
-                if (event.target === loginModal) {
-                    closeModal();
-                }
-            });
+                    // User management
+                    let currentUser = null;
 
-            function closeModal() {
-                loginModal.style.display = 'none';
-            }
+                    // Approved registration codes (you can change these)
+                    const APPROVED_CODES = ["DECADES2024", "BARSTAFF", "MANAGER123"];
 
-            // Modal login functionality
-            modalLoginBtn.addEventListener('click', function () {
-                const userName = document.getElementById('modal-user-name').value.trim();
-                const userRole = document.getElementById('modal-user-role').value;
-                const userEmail = document.getElementById('modal-user-email').value.trim();
+                    // User database in localStorage
+                    function getUserDatabase() {
+                        return JSON.parse(localStorage.getItem('decadesBarUsers')) || {};
+                    }
 
-                if (userName) {
-                    currentUser = {
-                        name: userName,
-                        role: userRole,
-                        email: userEmail,
-                        id: generateUserId(),
-                        progress: loadUserProgress(userName) || 0,
-                        acknowledged: loadUserAcknowledgment(userName) || false,
-                        loginTime: new Date().toISOString()
-                    };
+                    function saveUserDatabase(users) {
+                        localStorage.setItem('decadesBarUsers', JSON.stringify(users));
+                    }
 
-                    // Update UI
-                    document.getElementById('user-display').style.display = 'flex';
-                    document.getElementById('user-display-name').textContent = `${userName} (${userRole})`;
-                    document.getElementById('user-avatar').textContent = userName.charAt(0).toUpperCase();
+                    // Open login modal
+                    openLoginBtn.addEventListener('click', function () {
+                        closeAllModals();
+                        loginModal.style.display = 'block';
+                    });
 
-                    // Load user's progress
-                    updateProgressDisplay();
+                    // Open registration modal
+                    showRegisterLink.addEventListener('click', function () {
+                        closeAllModals();
+                        registerModal.style.display = 'block';
+                    });
 
-                    // Close modal
-                    closeModal();
-
-                    // Show welcome message
-                    showToast(`Welcome, ${userName}!`);
-
-                    // Save user data
-                    saveUserProgress();
-                } else {
-                    alert('Please enter your name');
-                }
-            });
-
-                    // Registration System
-                        const loginModal = document.getElementById('loginModal');
-                        const registerModal = document.getElementById('registerModal');
-                        const openLoginBtn = document.getElementById('login-btn');
-                        const closeModalBtns = document.querySelectorAll('.close-modal');
-                        const cancelModalBtns = document.querySelectorAll('.btn-secondary');
-                        const modalLoginBtn = document.getElementById('modal-login-btn');
-                        const registerSubmitBtn = document.getElementById('register-submit-btn');
-                        const showRegisterLink = document.getElementById('show-register');
-
-                        // Approved registration codes (you can change these)
-                        const APPROVED_CODES = ["DECADES2024", "BARSTAFF", "MANAGER123"];
-
-                        // User database in localStorage
-                        function getUserDatabase() {
-                            return JSON.parse(localStorage.getItem('decadesBarUsers')) || {};
-                        }
-
-                        function saveUserDatabase(users) {
-                            localStorage.setItem('decadesBarUsers', JSON.stringify(users));
-                        }
-
-                        // Open login modal
-                        openLoginBtn.addEventListener('click', function () {
-                            closeAllModals();
-                            loginModal.style.display = 'block';
+                    // Close all modals
+                    function closeAllModals() {
+                        document.querySelectorAll('.modal').forEach(modal => {
+                            modal.style.display = 'none';
                         });
+                    }
 
-                        // Open registration modal
-                        showRegisterLink.addEventListener('click', function () {
-                            closeAllModals();
+                    // Close modal when clicking X or Cancel buttons
+                    closeModalBtns.forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const modalId = this.getAttribute('data-modal');
+                            document.getElementById(modalId).style.display = 'none';
+                        });
+                    });
+
+                    cancelModalBtns.forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const modalId = this.getAttribute('data-modal');
+                            document.getElementById(modalId).style.display = 'none';
+                        });
+                    });
+
+                    // Close modal when clicking outside
+                    window.addEventListener('click', function (event) {
+                        if (event.target.classList.contains('modal')) {
+                            event.target.style.display = 'none';
+                        }
+                    });
+
+                    // Registration functionality
+                    registerSubmitBtn.addEventListener('click', function () {
+                        const name = document.getElementById('register-name').value.trim();
+                        const email = document.getElementById('register-email').value.trim();
+                        const position = document.getElementById('register-position').value;
+                        const code = document.getElementById('register-code').value.trim();
+
+                        if (!name || !email || !code) {
+                            alert('Please fill in all required fields');
+                            return;
+                        }
+
+                        if (!APPROVED_CODES.includes(code)) {
+                            alert('Invalid registration code. Please contact your manager.');
+                            return;
+                        }
+
+                        const users = getUserDatabase();
+
+                        // Check if user already exists
+                        if (users[email]) {
+                            alert('This email is already registered.');
+                            return;
+                        }
+
+                        // Create new user
+                        users[email] = {
+                            name: name,
+                            email: email,
+                            position: position,
+                            status: 'approved',
+                            registeredDate: new Date().toISOString(),
+                            progress: 0,
+                            acknowledged: false
+                        };
+
+                        saveUserDatabase(users);
+
+                        // Auto-login the new user
+                        currentUser = {
+                            name: name,
+                            role: position,
+                            email: email,
+                            id: email,
+                            progress: 0,
+                            acknowledged: false,
+                            loginTime: new Date().toISOString()
+                        };
+
+                        // Update UI
+                        document.getElementById('login-section').style.display = 'none';
+                        document.getElementById('user-display').style.display = 'flex';
+                        document.getElementById('user-display-name').textContent = `${name} (${position})`;
+                        document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+
+                        closeAllModals();
+                        showToast(`Welcome to Decades Bar, ${name}!`);
+                        updateProgressDisplay();
+                    });
+
+                    // Login functionality
+                    modalLoginBtn.addEventListener('click', function () {
+                        const email = document.getElementById('modal-user-email').value.trim();
+
+                        if (!email) {
+                            alert('Please enter your registered email');
+                            return;
+                        }
+
+                        const users = getUserDatabase();
+                        const user = users[email];
+
+                        if (!user) {
+                            alert('Email not found. Please register first.');
                             registerModal.style.display = 'block';
-                        });
-
-                        // Close all modals
-                        function closeAllModals() {
-                            document.querySelectorAll('.modal').forEach(modal => {
-                                modal.style.display = 'none';
-                            });
+                            return;
                         }
 
-                        // Close modal when clicking X or Cancel buttons
-                        closeModalBtns.forEach(btn => {
-                            btn.addEventListener('click', function () {
-                                const modalId = this.getAttribute('data-modal');
-                                document.getElementById(modalId).style.display = 'none';
-                            });
-                        });
+                        currentUser = {
+                            name: user.name,
+                            role: user.position,
+                            email: user.email,
+                            id: user.email,
+                            progress: user.progress || 0,
+                            acknowledged: user.acknowledged || false,
+                            loginTime: new Date().toISOString()
+                        };
 
-                        cancelModalBtns.forEach(btn => {
-                            btn.addEventListener('click', function () {
-                                const modalId = this.getAttribute('data-modal');
-                                document.getElementById(modalId).style.display = 'none';
-                            });
-                        });
+                        // Update UI
+                        document.getElementById('login-section').style.display = 'none';
+                        document.getElementById('user-display').style.display = 'flex';
+                        document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
+                        document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
 
-                        // Close modal when clicking outside
-                        window.addEventListener('click', function (event) {
-                            if (event.target.classList.contains('modal')) {
-                                event.target.style.display = 'none';
+                        closeAllModals();
+                        showToast(`Welcome back, ${user.name}!`);
+                        updateProgressDisplay();
+                    });
+
+                    // Logout functionality
+                    logoutBtn.addEventListener('click', function () {
+                        currentUser = null;
+                        document.getElementById('login-section').style.display = 'block';
+                        document.getElementById('user-display').style.display = 'none';
+                        showToast('Logged out successfully');
+                    });
+
+                    // Update progress display for current user
+                    function updateProgressDisplay() {
+                        if (currentUser) {
+                            progressFill.style.width = `${currentUser.progress}%`;
+                            progressText.textContent = `${currentUser.progress}% Complete`;
+
+                            // Update checkbox state
+                            acknowledgementCheckbox.checked = currentUser.acknowledged;
+
+                            if (currentUser.acknowledged) {
+                                submitBtn.disabled = true;
+                                submitBtn.textContent = 'Acknowledgement Submitted';
+                                submitBtn.style.backgroundColor = '#a0aec0';
+                            } else {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Submit Acknowledgement';
+                                submitBtn.style.backgroundColor = '';
                             }
-                        });
+                        }
+                    }
 
-                        // Registration functionality
-                        registerSubmitBtn.addEventListener('click', function () {
-                            const name = document.getElementById('register-name').value.trim();
-                            const email = document.getElementById('register-email').value.trim();
-                            const position = document.getElementById('register-position').value;
-                            const code = document.getElementById('register-code').value.trim();
+                    // Show toast notification
+                    function showToast(message) {
+                        toast.textContent = message;
+                        toast.classList.add('show');
+                        setTimeout(() => {
+                            toast.classList.remove('show');
+                        }, 3000);
+                    }
 
-                            if (!name || !email || !code) {
-                                alert('Please fill in all required fields');
-                                return;
-                            }
+                    // Generate unique user ID
+                    function generateUserId() {
+                        return 'user_' + Math.random().toString(36).substr(2, 9);
+                    }
 
-                            if (!APPROVED_CODES.includes(code)) {
-                                alert('Invalid registration code. Please contact your manager.');
-                                return;
-                            }
-
+                    // Save user progress to localStorage
+                    function saveUserProgress() {
+                        if (currentUser) {
                             const users = getUserDatabase();
-
-                            // Check if user already exists
-                            if (users[email]) {
-                                alert('This email is already registered.');
-                                return;
+                            if (users[currentUser.email]) {
+                                users[currentUser.email].progress = currentUser.progress;
+                                users[currentUser.email].acknowledged = currentUser.acknowledged;
+                                saveUserDatabase(users);
                             }
+                        }
+                    }
 
-                            // Create new user
-                            users[email] = {
-                                name: name,
-                                email: email,
-                                position: position,
-                                status: 'approved',
-                                registeredDate: new Date().toISOString(),
-                                progress: 0,
-                                acknowledged: false
-                            };
+                    // Update progress calculation to save per user
+                    document.querySelectorAll('.nav-links li').forEach(item => {
+                        item.addEventListener('click', function () {
+                            const targetId = this.getAttribute('data-target');
+                            const targetSection = document.getElementById(targetId);
 
-                            saveUserDatabase(users);
+                            if (!targetSection.classList.contains('visited') && currentUser) {
+                                targetSection.classList.add('visited');
+                                currentUser.progress = calculateProgress();
+                                saveUserProgress();
+                                updateProgressDisplay();
+                            }
+                        });
+                    });
 
-                            // Auto-login the new user
-                            currentUser = {
-                                name: name,
-                                role: position,
-                                email: email,
-                                id: email,
-                                progress: 0,
-                                acknowledged: false,
-                                loginTime: new Date().toISOString()
-                            };
-
-                            // Update UI
-                            document.getElementById('login-section').style.display = 'none';
-                            document.getElementById('user-display').style.display = 'flex';
-                            document.getElementById('user-display-name').textContent = `${name} (${position})`;
-                            document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
-
-                            closeAllModals();
-                            showToast(`Welcome to Decades Bar, ${name}!`);
+                    // Update acknowledgement to save per user
+                    submitBtn.addEventListener('click', function () {
+                        if (acknowledgementCheckbox.checked && currentUser) {
+                            currentUser.acknowledged = true;
+                            currentUser.progress = 100;
+                            saveUserProgress();
                             updateProgressDisplay();
-                        });
 
-                        // Login functionality
-                        modalLoginBtn.addEventListener('click', function () {
-                            const email = document.getElementById('modal-user-email').value.trim();
-
-                            if (!email) {
-                                alert('Please enter your registered email');
-                                return;
-                            }
-
-                            const users = getUserDatabase();
-                            const user = users[email];
-
-                            if (!user) {
-                                alert('Email not found. Please register first.');
-                                registerModal.style.display = 'block';
-                                return;
-                            }
-
-                            currentUser = {
-                                name: user.name,
-                                role: user.position,
-                                email: user.email,
-                                id: user.email,
-                                progress: user.progress || 0,
-                                acknowledged: user.acknowledged || false,
-                                loginTime: new Date().toISOString()
-                            };
-
-                            // Update UI
-                            document.getElementById('login-section').style.display = 'none';
-                            document.getElementById('user-display').style.display = 'flex';
-                            document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
-                            document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
-
-                            closeAllModals();
-                            showToast(`Welcome back, ${user.name}!`);
-                            updateProgressDisplay();
-                        });
-
-                        // Logout functionality
-                        document.getElementById('logout-btn').addEventListener('click', function () {
-                            currentUser = null;
-                            document.getElementById('login-section').style.display = 'block';
-                            document.getElementById('user-display').style.display = 'none';
-                            showToast('Logged out successfully');
-                        });
+                            // Show success message
+                            toast.classList.add('show');
+                            setTimeout(() => {
+                                toast.classList.remove('show');
+                            }, 3000);
+                        } else if (!currentUser) {
+                            alert('Please log in first to submit acknowledgment.');
+                        } else {
+                            alert('Please check the acknowledgement box before submitting.');
+                        }
+                    });
     </script>
 </body>
 </html>
