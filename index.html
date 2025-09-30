@@ -509,11 +509,18 @@
             color: white;
         }
 
-        #login-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        #login-barrier {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a365d, #2d3748);
+    z-index: 9999;  /* Lower than modal */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
         #user-display {
             display: none;
@@ -521,18 +528,18 @@
             gap: 10px;
         }
 
-        /* Modal Styles */
+                /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
+            z-index: 10000;  /* HIGHER than barrier */
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
         }
-
+        
         .modal-content {
             background-color: white;
             margin: 10% auto;
@@ -542,6 +549,8 @@
             max-width: 500px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             animation: modalSlideIn 0.3s ease;
+            position: relative;
+            z-index: 10001;  /* Even higher */
         }
 
         @keyframes modalSlideIn {
