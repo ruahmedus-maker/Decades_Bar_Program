@@ -582,14 +582,14 @@
         }
     
                 /* Cocktail Recipe Styles */
-        .cocktail-grid {
+        #cocktails .cocktail-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
             margin-top: 15px;
         }
 
-        .cocktail-card {
+        #cocktails .cocktail-card {
             background: #f8f9fa;
             padding: 20px;
             border-radius: 8px;
@@ -599,12 +599,12 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .cocktail-card:hover {
+        #cocktails .cocktail-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-        .cocktail-card h5 {
+        #cocktails .cocktail-card h5 {
             color: var(--primary);
             margin-bottom: 15px;
             padding-bottom: 8px;
@@ -612,37 +612,37 @@
             font-size: 1.1rem;
         }
 
-        .cocktail-card .ingredients,
-        .cocktail-card .instructions {
+        #cocktails .cocktail-card .ingredients,
+        #cocktails .cocktail-card .instructions {
             margin-bottom: 15px;
         }
 
-        .cocktail-card .ingredients {
+        #cocktails .cocktail-card .ingredients {
             background: white;
             padding: 15px;
             border-radius: 5px;
             border: 1px solid #e2e8f0;
         }
 
-        .cocktail-card .instructions {
+        #cocktails .cocktail-card .instructions {
             background: #fff9f0;
             padding: 15px;
             border-radius: 5px;
             border: 1px solid #ffeaa7;
         }
 
-        .cocktail-card ul,
-        .cocktail-card ol {
+        #cocktails .cocktail-card ul,
+        #cocktails .cocktail-card ol {
             margin: 8px 0;
             padding-left: 20px;
         }
 
-        .cocktail-card li {
+        #cocktails .cocktail-card li {
             margin-bottom: 5px;
             line-height: 1.4;
         }
 
-        .cocktail-card strong {
+        #cocktails .cocktail-card strong {
             color: var(--secondary);
             display: block;
             margin-bottom: 8px;
@@ -651,7 +651,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* FIX: Ensure cocktail card headers are visible */
+        /* FIX: Ensure ONLY cocktail section card headers are styled */
         #cocktails .card .card-header {
             background-color: var(--primary);
             color: white;
@@ -661,12 +661,16 @@
         #cocktails .card .card-header h4 {
             color: white;
             margin: 0;
-            position: relative;
-            display: inline-block;
         }
 
-        /* FIX: Only apply underline to Decades Summer Cocktails */
-        #cocktails .card:last-child .card-header h4::after {
+        /* FIX: Remove underline from ALL cocktail cards initially */
+        #cocktails .card .card-header h4::after {
+            display: none;
+        }
+
+        /* FIX: Apply underline ONLY to Decades Summer Cocktails using a specific class */
+        #cocktails .card.decades-summer .card-header h4::after {
+            display: block;
             content: '';
             position: absolute;
             bottom: -5px;
@@ -1433,7 +1437,7 @@
             </div>
 
                 <!-- Decades Summer Cocktails -->
-                <div class="card">
+                <div class="card decades-summer" style="margin-bottom: 25px;">
                     <div class="card-header">
                         <h4>Decades Summer Cocktails</h4>
                     </div>
