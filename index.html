@@ -678,7 +678,23 @@
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <body>
+        <!-- Login Barrier - Shows until user logs in -->
+        <div id="login-barrier"
+            style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a365d, #2d3748); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; text-align: center;">
+            <div
+                style="background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); color: #2d3748; max-width: 400px; width: 90%;">
+                <h2 style="color: #1a365d; margin-bottom: 20px;">Decades Bar Training</h2>
+                <p style="margin-bottom: 25px;">Please log in to access the training materials</p>
+                <button id="barrier-login-btn" class="btn"
+                    style="background: #d4af37; color: white; border: none; padding: 12px 30px; border-radius: 5px; font-size: 1.1rem; cursor: pointer; font-weight: bold;">
+                    Staff Login
+                </button>
+            </div>
+        </div>
+    
+    <div class="container" style="display: none;">
         <!-- Sidebar Navigation -->
         <div class="sidebar">
             <div class="logo">
@@ -1059,7 +1075,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3>Staff Login</h3>
-                        <button class="close-modal" data-modal="loginModal">&times;</button>
+                        
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
@@ -1071,7 +1087,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn-secondary" data-modal="loginModal">Cancel</button>
+                        
                         <button class="btn" id="modal-login-btn">Login</button>
                     </div>
                 </div>
@@ -1477,6 +1493,147 @@
                             alert('Please check the acknowledgement box before submitting.');
                         }
                     });
+
+                            // Login Barrier Functionality
+                                const loginBarrier = document.getElementById('login-barrier');
+                                const barrierLoginBtn = document.getElementById('barrier-login-btn');
+                                const mainContainer = document.querySelector('.container');
+
+                                // Show login modal when barrier login button is clicked
+                                barrierLoginBtn.addEventListener('click', function () {
+                                    closeAllModals();
+                                    loginModal.style.display = 'block';
+                                });
+
+                                // Function to show main content after login
+                                function showMainContent() {
+                                    loginBarrier.style.display = 'none';
+                                    mainContainer.style.display = 'flex';
+                                }
+
+                                // Function to hide main content (on logout)
+                                function hideMainContent() {
+                                    loginBarrier.style.display = 'flex';
+                                    mainContainer.style.display = 'none';
+                                }
+
+                                // Update login success to show main content
+                                const originalModalLogin = modalLoginBtn.onclick;
+                                modalLoginBtn.onclick = function () {
+                                    const email = document.getElementById('modal-user-email').value.trim();
+
+                                    if (!email) {
+                                        alert('Please enter your registered email');
+                                        return;
+                                    }
+
+                                    const users = getUserDatabase();
+                                    const user = users[email];
+
+                                    if (!user) {
+                                        alert('Email not found. Please register first.');
+                                        registerModal.style.display = 'block';
+                                        return;
+                                    }
+
+                                    currentUser = {
+                                        name: user.name,
+                                        role: user.position,
+                                        email: user.email,
+                                        id: user.email,
+                                        progress: user.progress || 0,
+                                        acknowledged: user.acknowledged || false,
+                                        loginTime: new Date().toISOString()
+                                    };
+
+                                    // Update UI
+                                    document.getElementById('login-section').style.display = 'none';
+                                    document.getElementById('user-display').style.display = 'flex';
+                                    document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
+                                    document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
+
+                                    closeAllModals();
+                                    showMainContent(); // ← THIS IS THE KEY LINE
+                                    showToast(`Welcome back, ${user.name}!`);
+                                    updateProgressDisplay();
+                                };
+
+                                // Update registration success to show main content
+                                const originalRegisterSubmit = registerSubmitBtn.onclick;
+                                registerSubmitBtn.onclick = function () {
+                                    const name = document.getElementById('register-name').value.trim();
+                                    const email = document.getElementById('register-email').value.trim();
+                                    const position = document.getElementById('register-position').value;
+                                    const code = document.getElementById('register-code').value.trim();
+
+                                    if (!name || !email || !code) {
+                                        alert('Please fill in all required fields');
+                                        return;
+                                    }
+
+                                    if (!APPROVED_CODES.includes(code)) {
+                                        alert('Invalid registration code. Please contact your manager.');
+                                        return;
+                                    }
+
+                                    const users = getUserDatabase();
+
+                                    // Check if user already exists
+                                    if (users[email]) {
+                                        alert('This email is already registered.');
+                                        return;
+                                    }
+
+                                    // Create new user
+                                    users[email] = {
+                                        name: name,
+                                        email: email,
+                                        position: position,
+                                        status: 'approved',
+                                        registeredDate: new Date().toISOString(),
+                                        progress: 0,
+                                        acknowledged: false
+                                    };
+
+                                    saveUserDatabase(users);
+
+                                    // Auto-login the new user
+                                    currentUser = {
+                                        name: name,
+                                        role: position,
+                                        email: email,
+                                        id: email,
+                                        progress: 0,
+                                        acknowledged: false,
+                                        loginTime: new Date().toISOString()
+                                    };
+
+                                    // Update UI
+                                    document.getElementById('login-section').style.display = 'none';
+                                    document.getElementById('user-display').style.display = 'flex';
+                                    document.getElementById('user-display-name').textContent = `${name} (${position})`;
+                                    document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+
+                                    closeAllModals();
+                                    showMainContent(); // ← THIS IS THE KEY LINE
+                                    showToast(`Welcome to Decades Bar, ${name}!`);
+                                    updateProgressDisplay();
+                                };
+
+                                // Update logout to hide main content
+                                logoutBtn.addEventListener('click', function () {
+                                    currentUser = null;
+                                    document.getElementById('login-section').style.display = 'block';
+                                    document.getElementById('user-display').style.display = 'none';
+                                    hideMainContent(); // ← THIS IS THE KEY LINE
+                                    showToast('Logged out successfully');
+                                });
+
+                                // Check if user is already logged in (on page refresh)
+                                window.addEventListener('load', function () {
+                                    // You could add logic here to check if user was previously logged in
+                                    // For now, we'll always show the barrier until fresh login
+                                });
     </script>
 </body>
 </html>
