@@ -581,7 +581,7 @@
             opacity: 1;
         }
     
-                /* Cocktail Recipe Styles - CLEAN VERSION */
+                /* Cocktail Recipe Styles */
         #cocktails .cocktail-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -663,13 +663,18 @@
             font-size: 1.2rem;
         }
 
-        /* Special underline ONLY for Decades Summer Cocktails */
+        /* Remove underline from ALL cocktail cards */
+        #cocktails .card .card-header h4::after {
+            display: none;
+        }
+
+        /* Add underline ONLY to Decades Summer Cocktails using a specific ID */
         #cocktails .card:last-child .card-header h4 {
             position: relative;
-            display: inline-block;
         }
 
         #cocktails .card:last-child .card-header h4::after {
+            display: block;
             content: '';
             position: absolute;
             bottom: -8px;
@@ -678,18 +683,6 @@
             height: 3px;
             background: var(--accent);
             border-radius: 2px;
-        }
-
-        /* Responsive adjustments for cocktails */
-        @media (max-width: 768px) {
-            #cocktails .cocktail-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            #cocktails .cocktail-card {
-                padding: 15px;
-            }
         }
     </style>
 </head>
@@ -1572,6 +1565,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
             <!-- FAQ Section -->
             <div class="section" id="faq">
