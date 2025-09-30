@@ -1551,21 +1551,6 @@
                                                     return;
                                                 }
 
-                                                if (directRegisterBtn) {
-                                                    directRegisterBtn.addEventListener('click', function () {
-                                                        console.log('Register button clicked');
-                                                        // Show registration modal
-                                                        const registerModal = document.getElementById('registerModal');
-                                                        if (registerModal) {
-                                                            registerModal.style.display = 'block';
-                                                        } else {
-                                                            console.error('Register modal not found');
-                                                        }
-                                                    });
-                                                } else {
-                                                    console.error('Register button not found');
-                                                }
-
                                                 // Login successful
                                                 currentUser = {
                                                     name: user.name,
@@ -1592,14 +1577,21 @@
                                             });
                                         }
 
-                                        if (directRegisterBtn) {
-                                            directRegisterBtn.addEventListener('click', function () {
-                                                // Show registration modal
-                                                if (registerModal) {
-                                                    registerModal.style.display = 'block';
-                                                }
-                                            });
-                                        }
+                                        // Fix for Register button
+                                            if (directRegisterBtn) {
+                                                directRegisterBtn.addEventListener('click', function () {
+                                                    console.log('Register button clicked');
+                                                    // Show registration modal
+                                                    const registerModal = document.getElementById('registerModal');
+                                                    if (registerModal) {
+                                                        registerModal.style.display = 'block';
+                                                    } else {
+                                                        console.error('Register modal not found');
+                                                    }
+                                                });
+                                            } else {
+                                                console.error('Register button not found');
+                                            }
                                 // Function to show main content after login
                                 function showMainContent() {
                                     loginBarrier.style.display = 'none';
