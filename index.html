@@ -1456,7 +1456,10 @@
             // Debug info
             console.log('=== System Ready ===');
             console.log('Register button:', document.getElementById('direct-register'));
-            console.log('Login button:', document.getElementById('direct-login'));                                   
+            console.log('Login button:', document.getElementById('direct-login'));   
+            
+                    // Ensure registration modal is closed on page load
+                        document.getElementById('registerModal').style.display = 'none';
     </script>
 </body>
 </html>
