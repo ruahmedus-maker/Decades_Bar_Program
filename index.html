@@ -1420,12 +1420,33 @@
                     });
 
                     // Logout functionality
-                    logoutBtn.addEventListener('click', function () {
-                        currentUser = null;
-                        document.getElementById('login-section').style.display = 'block';
-                        document.getElementById('user-display').style.display = 'none';
-                        showToast('Logged out successfully');
-                    });
+                            // Fix for Logout button - COMPLETE REWRITE
+                                document.addEventListener('click', function (event) {
+                                    // Check if logout button was clicked (using event delegation)
+                                    if (event.target.id === 'logout-btn' || event.target.closest('#logout-btn')) {
+                                        console.log('Logout button clicked');
+
+                                        // Reset user
+                                        currentUser = null;
+
+                                        // Reset the header login section
+                                        document.getElementById('login-section').style.display = 'block';
+                                        document.getElementById('user-display').style.display = 'none';
+
+                                        // Hide main content, show barrier
+                                        document.getElementById('login-barrier').style.display = 'flex';
+                                        document.querySelector('.container').style.display = 'none';
+
+                                        // Clear the direct login form
+                                        document.getElementById('direct-email').value = '';
+
+                                        showToast('Logged out successfully');
+
+                                        // Prevent any default behavior
+                                        event.preventDefault();
+                                        return false;
+                                    }
+                                });
 
                     // Update progress display for current user
                     function updateProgressDisplay() {
@@ -1528,6 +1549,21 @@
                                                 if (!user) {
                                                     alert('Email not found. Please register first.');
                                                     return;
+                                                }
+
+                                                if (directRegisterBtn) {
+                                                    directRegisterBtn.addEventListener('click', function () {
+                                                        console.log('Register button clicked');
+                                                        // Show registration modal
+                                                        const registerModal = document.getElementById('registerModal');
+                                                        if (registerModal) {
+                                                            registerModal.style.display = 'block';
+                                                        } else {
+                                                            console.error('Register modal not found');
+                                                        }
+                                                    });
+                                                } else {
+                                                    console.error('Register button not found');
                                                 }
 
                                                 // Login successful
