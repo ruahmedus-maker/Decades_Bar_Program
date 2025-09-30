@@ -1496,14 +1496,22 @@
 
                             // Login Barrier Functionality
                                 const loginBarrier = document.getElementById('login-barrier');
-                                const barrierLoginBtn = document.getElementById('barrier-login-btn');
-                                const mainContainer = document.querySelector('.container');
+                                    const barrierLoginBtn = document.getElementById('barrier-login-btn');
+                                    const mainContainer = document.querySelector('.container');
 
-                                // Show login modal when barrier login button is clicked
-                                barrierLoginBtn.addEventListener('click', function () {
-                                    closeAllModals();
-                                    loginModal.style.display = 'block';
-                                });
+                                    // Show login modal when barrier login button is clicked - FIXED VERSION
+                                    if (barrierLoginBtn) {
+                                        barrierLoginBtn.addEventListener('click', function () {
+                                            console.log('Barrier login button clicked'); // Debug line
+                                            if (loginModal) {
+                                                loginModal.style.display = 'block';
+                                            } else {
+                                                console.error('loginModal not found');
+                                            }
+                                        });
+                                    } else {
+                                        console.error('barrierLoginBtn not found');
+                                    }
 
                                 // Function to show main content after login
                                 function showMainContent() {
@@ -1634,6 +1642,16 @@
                                     // You could add logic here to check if user was previously logged in
                                     // For now, we'll always show the barrier until fresh login
                                 });
+
+                                        // Debug: Check if elements exist
+                                            console.log('Barrier button:', document.getElementById('barrier-login-btn'));
+                                            console.log('Login modal:', document.getElementById('loginModal'));
+                                            console.log('All modals:', document.querySelectorAll('.modal'));
+
+                                            // Simple test: Alert when page loads
+                                            window.addEventListener('load', function () {
+                                                console.log('Page loaded - barrier should be visible');
+                                            });
     </script>
 </body>
 </html>
