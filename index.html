@@ -691,7 +691,7 @@
     
                 <!-- Direct login form right in the barrier -->
                 <div style="margin-bottom: 20px;">
-                    <input type="email" id="direct-email" placeholder="your.email@decadesbar.com"
+                    <input type="email" id="direct-email" placeholder="your.email@domain.com"
                         style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 5px; margin-bottom: 15px;">
                     <button id="direct-login"
                         style="background: #d4af37; color: white; border: none; padding: 12px 30px; border-radius: 5px; font-size: 1.1rem; cursor: pointer; font-weight: bold; width: 100%;">
@@ -1152,622 +1152,311 @@
     <div class="toast" id="toast">Acknowledgement submitted successfully!</div>
     
     <script>
-                // Navigation functionality
-                    document.querySelectorAll('.nav-links li').forEach(item => {
-                        item.addEventListener('click', function () {
-                            // Remove active class from all nav items
-                            document.querySelectorAll('.nav-links li').forEach(li => {
-                                li.classList.remove('active');
-                            });
+           // ========== CLEANED & FIXED JAVASCRIPT ==========
 
-                            // Add active class to clicked nav item
-                            this.classList.add('active');
-
-                            // Hide all sections
-                            document.querySelectorAll('.section').forEach(section => {
-                                section.classList.remove('active');
-                            });
-
-                            // Show the target section
-                            const targetId = this.getAttribute('data-target');
-                            document.getElementById(targetId).classList.add('active');
-
-                            // Update page title
-                            document.getElementById('page-title').textContent = this.querySelector('a').textContent.trim();
-                        });
+            // Navigation functionality
+            document.querySelectorAll('.nav-links li').forEach(item => {
+                item.addEventListener('click', function () {
+                    // Remove active class from all nav items
+                    document.querySelectorAll('.nav-links li').forEach(li => {
+                        li.classList.remove('active');
                     });
 
-                    // FAQ toggle functionality
-                    document.querySelectorAll('.faq-question').forEach(question => {
-                        question.addEventListener('click', function () {
-                            const faqItem = this.parentElement;
-                            faqItem.classList.toggle('active');
-                        });
+                    // Add active class to clicked nav item
+                    this.classList.add('active');
+
+                    // Hide all sections
+                    document.querySelectorAll('.section').forEach(section => {
+                        section.classList.remove('active');
                     });
 
-                    // Progress tracking
-                    const acknowledgementCheckbox = document.getElementById('acknowledgement');
-                    const submitBtn = document.getElementById('submit-btn');
-                    const progressFill = document.getElementById('progress-fill');
-                    const progressText = document.getElementById('progress-text');
-                    const toast = document.getElementById('toast');
+                    // Show the target section
+                    const targetId = this.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
 
-                    // Calculate initial progress based on visited sections
-                    function calculateProgress() {
-                        const sections = document.querySelectorAll('.section');
-                        let visitedCount = 0;
+                    // Update page title
+                    document.getElementById('page-title').textContent = this.querySelector('a').textContent.trim();
 
-                        sections.forEach(section => {
-                            if (section.classList.contains('visited')) {
-                                visitedCount++;
-                            }
-                        });
-
-                        const progress = Math.round((visitedCount / sections.length) * 100);
-                        progressFill.style.width = `${progress}%`;
-                        progressText.textContent = `${progress}% Complete`;
-
-                        return progress;
+                    // Mark section as visited for progress tracking
+                    if (!document.getElementById(targetId).classList.contains('visited')) {
+                        document.getElementById(targetId).classList.add('visited');
+                        calculateProgress();
                     }
+                });
+            });
 
-                    // Mark sections as visited when they're viewed
-                    document.querySelectorAll('.nav-links li').forEach(item => {
-                        item.addEventListener('click', function () {
-                            const targetId = this.getAttribute('data-target');
-                            const targetSection = document.getElementById(targetId);
+            // FAQ toggle functionality
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', function () {
+                    const faqItem = this.parentElement;
+                    faqItem.classList.toggle('active');
+                });
+            });
 
-                            if (!targetSection.classList.contains('visited')) {
-                                targetSection.classList.add('visited');
-                                calculateProgress();
-                            }
-                        });
-                    });
+            // Progress tracking
+            const acknowledgementCheckbox = document.getElementById('acknowledgement');
+            const submitBtn = document.getElementById('submit-btn');
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            const toast = document.getElementById('toast');
 
-                    // Submit acknowledgement
-                    submitBtn.addEventListener('click', function () {
-                        if (acknowledgementCheckbox.checked) {
-                            // Show success message
-                            toast.classList.add('show');
+            // Calculate progress function
+            function calculateProgress() {
+                const sections = document.querySelectorAll('.section');
+                let visitedCount = 0;
 
-                            // Update progress to 100%
-                            progressFill.style.width = '100%';
-                            progressText.textContent = '100% Complete';
-
-                            // Disable the button
-                            submitBtn.disabled = true;
-                            submitBtn.textContent = 'Acknowledgement Submitted';
-                            submitBtn.style.backgroundColor = '#a0aec0';
-
-                            // Hide toast after 3 seconds
-                            setTimeout(() => {
-                                toast.classList.remove('show');
-                            }, 3000);
-                        } else {
-                            alert('Please check the acknowledgement box before submitting.');
-                        }
-                    });
-
-                    // Initialize progress
-                    document.getElementById('welcome').classList.add('visited');
-                    calculateProgress();
-
-                    // ========== LOGIN & REGISTRATION SYSTEM ==========
-
-                    // Registration System Variables
-                    const loginModal = document.getElementById('loginModal');
-                    const registerModal = document.getElementById('registerModal');
-                    const openLoginBtn = document.getElementById('login-btn');
-                    const closeModalBtns = document.querySelectorAll('.close-modal');
-                    const cancelModalBtns = document.querySelectorAll('.btn-secondary');
-                    const modalLoginBtn = document.getElementById('modal-login-btn');
-                    const registerSubmitBtn = document.getElementById('register-submit-btn');
-                    const showRegisterLink = document.getElementById('show-register');
-                    const logoutBtn = document.getElementById('logout-btn');
-
-                    // User management
-                    let currentUser = null;
-
-                    // Approved registration codes (you can change these)
-                    const APPROVED_CODES = ["DECADES2025", "BARSTAFF", "MANAGER123"];
-
-                    // User database in localStorage
-                    function getUserDatabase() {
-                        return JSON.parse(localStorage.getItem('decadesBarUsers')) || {};
+                sections.forEach(section => {
+                    if (section.classList.contains('visited')) {
+                        visitedCount++;
                     }
-
-                    function saveUserDatabase(users) {
-                        localStorage.setItem('decadesBarUsers', JSON.stringify(users));
-                    }
-
-                    // Open login modal
-                    openLoginBtn.addEventListener('click', function () {
-                        closeAllModals();
-                        loginModal.style.display = 'block';
-                    });
-
-                    // Open registration modal
-                    showRegisterLink.addEventListener('click', function () {
-                        closeAllModals();
-                        registerModal.style.display = 'block';
-                    });
-
-                    // Close all modals
-                    function closeAllModals() {
-                        document.querySelectorAll('.modal').forEach(modal => {
-                            modal.style.display = 'none';
-                        });
-                    }
-
-                    // Close modal when clicking X or Cancel buttons
-                    closeModalBtns.forEach(btn => {
-                        btn.addEventListener('click', function () {
-                            const modalId = this.getAttribute('data-modal');
-                            document.getElementById(modalId).style.display = 'none';
-                        });
-                    });
-
-                    cancelModalBtns.forEach(btn => {
-                        btn.addEventListener('click', function () {
-                            const modalId = this.getAttribute('data-modal');
-                            document.getElementById(modalId).style.display = 'none';
-                        });
-                    });
-
-                    // Close modal when clicking outside
-                    window.addEventListener('click', function (event) {
-                        if (event.target.classList.contains('modal')) {
-                            event.target.style.display = 'none';
-                        }
-                    });
-
-                    // Registration functionality
-                    registerSubmitBtn.addEventListener('click', function () {
-                        const name = document.getElementById('register-name').value.trim();
-                        const email = document.getElementById('register-email').value.trim();
-                        const position = document.getElementById('register-position').value;
-                        const code = document.getElementById('register-code').value.trim();
-
-                        if (!name || !email || !code) {
-                            alert('Please fill in all required fields');
-                            return;
-                        }
-
-                        if (!APPROVED_CODES.includes(code)) {
-                            alert('Invalid registration code. Please contact your manager.');
-                            return;
-                        }
-
-                        const users = getUserDatabase();
-
-                        // Check if user already exists
-                        if (users[email]) {
-                            alert('This email is already registered.');
-                            return;
-                        }
-
-                        // Create new user
-                        users[email] = {
-                            name: name,
-                            email: email,
-                            position: position,
-                            status: 'approved',
-                            registeredDate: new Date().toISOString(),
-                            progress: 0,
-                            acknowledged: false
-                        };
-
-                        saveUserDatabase(users);
-
-                        // Auto-login the new user
-                        currentUser = {
-                            name: name,
-                            role: position,
-                            email: email,
-                            id: email,
-                            progress: 0,
-                            acknowledged: false,
-                            loginTime: new Date().toISOString()
-                        };
-
-                        // Update UI
-                        document.getElementById('login-section').style.display = 'none';
-                        document.getElementById('user-display').style.display = 'flex';
-                        document.getElementById('user-display-name').textContent = `${name} (${position})`;
-                        document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
-
-                        closeAllModals();
-                        showToast(`Welcome to Decades Bar, ${name}!`);
-                        updateProgressDisplay();
-                    });
-
-                    // Login functionality
-                    modalLoginBtn.addEventListener('click', function () {
-                        const email = document.getElementById('modal-user-email').value.trim();
-
-                        if (!email) {
-                            alert('Please enter your registered email');
-                            return;
-                        }
-
-                        const users = getUserDatabase();
-                        const user = users[email];
-
-                        if (!user) {
-                            alert('Email not found. Please register first.');
-                            registerModal.style.display = 'block';
-                            return;
-                        }
-
-                        currentUser = {
-                            name: user.name,
-                            role: user.position,
-                            email: user.email,
-                            id: user.email,
-                            progress: user.progress || 0,
-                            acknowledged: user.acknowledged || false,
-                            loginTime: new Date().toISOString()
-                        };
-
-                        // Update UI
-                        document.getElementById('login-section').style.display = 'none';
-                        document.getElementById('user-display').style.display = 'flex';
-                        document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
-                        document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
-
-                        closeAllModals();
-                        showToast(`Welcome back, ${user.name}!`);
-                        updateProgressDisplay();
-                    });
-
-                    // Logout functionality
-                            // Fix for Logout button - COMPLETE REWRITE
-                                document.addEventListener('click', function (event) {
-                                    // Check if logout button was clicked (using event delegation)
-                                    if (event.target.id === 'logout-btn' || event.target.closest('#logout-btn')) {
-                                        console.log('Logout button clicked');
-
-                                        // Reset user
-                                        currentUser = null;
-
-                                        // Reset the header login section
-                                        document.getElementById('login-section').style.display = 'block';
-                                        document.getElementById('user-display').style.display = 'none';
-
-                                        // Hide main content, show barrier
-                                        document.getElementById('login-barrier').style.display = 'flex';
-                                        document.querySelector('.container').style.display = 'none';
-
-                                        // Clear the direct login form
-                                        document.getElementById('direct-email').value = '';
-
-                                        showToast('Logged out successfully');
-
-                                        // Prevent any default behavior
-                                        event.preventDefault();
-                                        return false;
-                                    }
-                                });
-
-                    // Update progress display for current user
-                    function updateProgressDisplay() {
-                        if (currentUser) {
-                            progressFill.style.width = `${currentUser.progress}%`;
-                            progressText.textContent = `${currentUser.progress}% Complete`;
-
-                            // Update checkbox state
-                            acknowledgementCheckbox.checked = currentUser.acknowledged;
-
-                            if (currentUser.acknowledged) {
-                                submitBtn.disabled = true;
-                                submitBtn.textContent = 'Acknowledgement Submitted';
-                                submitBtn.style.backgroundColor = '#a0aec0';
-                            } else {
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = 'Submit Acknowledgement';
-                                submitBtn.style.backgroundColor = '';
-                            }
-                        }
-                    }
-
-                    // Show toast notification
-                    function showToast(message) {
-                        toast.textContent = message;
-                        toast.classList.add('show');
-                        setTimeout(() => {
-                            toast.classList.remove('show');
-                        }, 3000);
-                    }
-
-                    // Generate unique user ID
-                    function generateUserId() {
-                        return 'user_' + Math.random().toString(36).substr(2, 9);
-                    }
-
-                    // Save user progress to localStorage
-                    function saveUserProgress() {
-                        if (currentUser) {
-                            const users = getUserDatabase();
-                            if (users[currentUser.email]) {
-                                users[currentUser.email].progress = currentUser.progress;
-                                users[currentUser.email].acknowledged = currentUser.acknowledged;
-                                saveUserDatabase(users);
-                            }
-                        }
-                    }
-
-                    // Update progress calculation to save per user
-                    document.querySelectorAll('.nav-links li').forEach(item => {
-                        item.addEventListener('click', function () {
-                            const targetId = this.getAttribute('data-target');
-                            const targetSection = document.getElementById(targetId);
-
-                            if (!targetSection.classList.contains('visited') && currentUser) {
-                                targetSection.classList.add('visited');
-                                currentUser.progress = calculateProgress();
-                                saveUserProgress();
-                                updateProgressDisplay();
-                            }
-                        });
-                    });
-
-                    // Update acknowledgement to save per user
-                    submitBtn.addEventListener('click', function () {
-                        if (acknowledgementCheckbox.checked && currentUser) {
-                            currentUser.acknowledged = true;
-                            currentUser.progress = 100;
-                            saveUserProgress();
-                            updateProgressDisplay();
-
-                            // Show success message
-                            toast.classList.add('show');
-                            setTimeout(() => {
-                                toast.classList.remove('show');
-                            }, 3000);
-                        } else if (!currentUser) {
-                            alert('Please log in first to submit acknowledgment.');
-                        } else {
-                            alert('Please check the acknowledgement box before submitting.');
-                        }
-                    });
-
-                                    // Direct barrier login functionality
-                                        const directLoginBtn = document.getElementById('direct-login');
-                                        const directRegisterBtn = document.getElementById('direct-register');
-
-                                        if (directLoginBtn) {
-                                            directLoginBtn.addEventListener('click', function () {
-                                                const email = document.getElementById('direct-email').value.trim();
-
-                                                if (!email) {
-                                                    alert('Please enter your email');
-                                                    return;
-                                                }
-
-                                                const users = getUserDatabase();
-                                                const user = users[email];
-
-                                                if (!user) {
-                                                    alert('Email not found. Please register first.');
-                                                    return;
-                                                }
-
-                                                // Login successful
-                                                currentUser = {
-                                                    name: user.name,
-                                                    role: user.position,
-                                                    email: user.email,
-                                                    id: user.email,
-                                                    progress: user.progress || 0,
-                                                    acknowledged: user.acknowledged || false,
-                                                    loginTime: new Date().toISOString()
-                                                };
-
-                                                // Update UI and show main content
-                                                document.getElementById('login-section').style.display = 'none';
-                                                document.getElementById('user-display').style.display = 'flex';
-                                                document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
-                                                document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
-
-                                                // Hide barrier, show main content
-                                                document.getElementById('login-barrier').style.display = 'none';
-                                                document.querySelector('.container').style.display = 'flex';
-
-                                                showToast(`Welcome back, ${user.name}!`);
-                                                updateProgressDisplay();
-                                            });
-                                        }
-
-                                        // Fix for Register button
-                                            if (directRegisterBtn) {
-                                                directRegisterBtn.addEventListener('click', function () {
-                                                    console.log('Register button clicked');
-                                                    // Show registration modal
-                                                    const registerModal = document.getElementById('registerModal');
-                                                    if (registerModal) {
-                                                        registerModal.style.display = 'block';
-                                                    } else {
-                                                        console.error('Register modal not found');
-                                                    }
-                                                });
-                                            } else {
-                                                console.error('Register button not found');
-                                            }
-                                // Function to show main content after login
-                                function showMainContent() {
-                                    loginBarrier.style.display = 'none';
-                                    mainContainer.style.display = 'flex';
-                                }
-
-                                // Function to hide main content (on logout)
-                                function hideMainContent() {
-                                    loginBarrier.style.display = 'flex';
-                                    mainContainer.style.display = 'none';
-                                }
-
-                                // Update login success to show main content
-                                const originalModalLogin = modalLoginBtn.onclick;
-                                modalLoginBtn.onclick = function () {
-                                    const email = document.getElementById('modal-user-email').value.trim();
-
-                                    if (!email) {
-                                        alert('Please enter your registered email');
-                                        return;
-                                    }
-
-                                    const users = getUserDatabase();
-                                    const user = users[email];
-
-                                    if (!user) {
-                                        alert('Email not found. Please register first.');
-                                        registerModal.style.display = 'block';
-                                        return;
-                                    }
-
-                                    currentUser = {
-                                        name: user.name,
-                                        role: user.position,
-                                        email: user.email,
-                                        id: user.email,
-                                        progress: user.progress || 0,
-                                        acknowledged: user.acknowledged || false,
-                                        loginTime: new Date().toISOString()
-                                    };
-
-                                    // Update UI
-                                    document.getElementById('login-section').style.display = 'none';
-                                    document.getElementById('user-display').style.display = 'flex';
-                                    document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
-                                    document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
-
-                                    closeAllModals();
-                                    showMainContent(); // ← THIS IS THE KEY LINE
-                                    showToast(`Welcome back, ${user.name}!`);
-                                    updateProgressDisplay();
-                                };
-
-                                // Update registration success to show main content
-                                const originalRegisterSubmit = registerSubmitBtn.onclick;
-                                registerSubmitBtn.onclick = function () {
-                                    const name = document.getElementById('register-name').value.trim();
-                                    const email = document.getElementById('register-email').value.trim();
-                                    const position = document.getElementById('register-position').value;
-                                    const code = document.getElementById('register-code').value.trim();
-
-                                    if (!name || !email || !code) {
-                                        alert('Please fill in all required fields');
-                                        return;
-                                    }
-
-                                    if (!APPROVED_CODES.includes(code)) {
-                                        alert('Invalid registration code. Please contact your manager.');
-                                        return;
-                                    }
-
-                                    const users = getUserDatabase();
-
-                                    // Check if user already exists
-                                    if (users[email]) {
-                                        alert('This email is already registered.');
-                                        return;
-                                    }
-
-                                    // Create new user
-                                    users[email] = {
-                                        name: name,
-                                        email: email,
-                                        position: position,
-                                        status: 'approved',
-                                        registeredDate: new Date().toISOString(),
-                                        progress: 0,
-                                        acknowledged: false
-                                    };
-
-                                    saveUserDatabase(users);
-
-                                    // Auto-login the new user
-                                    currentUser = {
-                                        name: name,
-                                        role: position,
-                                        email: email,
-                                        id: email,
-                                        progress: 0,
-                                        acknowledged: false,
-                                        loginTime: new Date().toISOString()
-                                    };
-
-                                    // Update UI
-                                    document.getElementById('login-section').style.display = 'none';
-                                    document.getElementById('user-display').style.display = 'flex';
-                                    document.getElementById('user-display-name').textContent = `${name} (${position})`;
-                                    document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
-
-                                    closeAllModals();
-                                    showMainContent(); // ← THIS IS THE KEY LINE
-                                    showToast(`Welcome to Decades Bar, ${name}!`);
-                                    updateProgressDisplay();
-                                };
-
-                                //Logout functionality
-                                    // Fix for Logout button - COMPLETE REWRITE
-                                    document.addEventListener('click', function (event) {
-                                        // Check if logout button was clicked (using event delegation)
-                                        if (event.target.id === 'logout-btn' || event.target.closest('#logout-btn')) {
-                                            console.log('Logout button clicked');
-
-                                            // Reset user
-                                            currentUser = null;
-
-                                            // Reset the header login section
-                                            document.getElementById('login-section').style.display = 'block';
-                                            document.getElementById('user-display').style.display = 'none';
-
-                                            // Hide main content, show barrier
-                                            document.getElementById('login-barrier').style.display = 'flex';
-                                            document.querySelector('.container').style.display = 'none';
-
-                                            // Clear the direct login form
-                                            document.getElementById('direct-email').value = '';
-
-                                            showToast('Logged out successfully');
-
-                                            // Prevent any default behavior
-                                            event.preventDefault();
-                                            return false;
-                                        }
-                                    });
-
-                                // Check if user is already logged in (on page refresh)
-                                window.addEventListener('load', function () {
-                                    // You could add logic here to check if user was previously logged in
-                                    // For now, we'll always show the barrier until fresh login
-                                });
-
-                                        // Debug: Check if elements exist
-                                            console.log('Barrier button:', document.getElementById('barrier-login-btn'));
-                                            console.log('Login modal:', document.getElementById('loginModal'));
-                                            console.log('All modals:', document.querySelectorAll('.modal'));
-
-                                            // Simple test: Alert when page loads
-                                            window.addEventListener('load', function () {
-                                                console.log('Page loaded - barrier should be visible');
-                                            });
-                                            
-              // DEBUG: Check why register button isn't working
-                console.log("=== DEBUG REGISTER BUTTON ===");
-                console.log("Register button element:", document.getElementById('direct-register'));
-                console.log("Register modal element:", document.getElementById('registerModal'));
-
-                // Test if we can manually make it work
-                const testRegisterBtn = document.getElementById('direct-register');
-                if (testRegisterBtn) {
-                    console.log("Register button FOUND, testing click...");
-                    testRegisterBtn.onclick = function () {
-                        console.log("Manual onclick worked!");
-                        document.getElementById('registerModal').style.display = 'block';
-                    };
+                });
+
+                const progress = Math.round((visitedCount / sections.length) * 100);
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `${progress}% Complete`;
+
+                return progress;
+            }
+
+            // Submit acknowledgement
+            submitBtn.addEventListener('click', function () {
+                if (acknowledgementCheckbox.checked) {
+                    // Show success message
+                    toast.classList.add('show');
+
+                    // Update progress to 100%
+                    progressFill.style.width = '100%';
+                    progressText.textContent = '100% Complete';
+
+                    // Disable the button
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Acknowledgement Submitted';
+                    submitBtn.style.backgroundColor = '#a0aec0';
+
+                    // Hide toast after 3 seconds
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                    }, 3000);
                 } else {
-                    console.log("Register button NOT FOUND - checking HTML...");
-                }                                      
+                    alert('Please check the acknowledgement box before submitting.');
+                }
+            });
+
+            // Initialize progress
+            document.getElementById('welcome').classList.add('visited');
+            calculateProgress();
+
+            // ========== LOGIN & REGISTRATION SYSTEM ==========
+
+            // User management
+            let currentUser = null;
+            const APPROVED_CODES = ["DECADES2025", "BARSTAFF", "MANAGER123"];
+
+            // User database functions
+            function getUserDatabase() {
+                return JSON.parse(localStorage.getItem('decadesBarUsers')) || {};
+            }
+
+            function saveUserDatabase(users) {
+                localStorage.setItem('decadesBarUsers', JSON.stringify(users));
+            }
+
+            // Toast function
+            function showToast(message) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+            // Update progress display
+            function updateProgressDisplay() {
+                if (currentUser) {
+                    progressFill.style.width = `${currentUser.progress}%`;
+                    progressText.textContent = `${currentUser.progress}% Complete`;
+
+                    acknowledgementCheckbox.checked = currentUser.acknowledged;
+
+                    if (currentUser.acknowledged) {
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Acknowledgement Submitted';
+                        submitBtn.style.backgroundColor = '#a0aec0';
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Submit Acknowledgement';
+                        submitBtn.style.backgroundColor = '';
+                    }
+                }
+            }
+
+            // Save user progress
+            function saveUserProgress() {
+                if (currentUser) {
+                    const users = getUserDatabase();
+                    if (users[currentUser.email]) {
+                        users[currentUser.email].progress = currentUser.progress;
+                        users[currentUser.email].acknowledged = currentUser.acknowledged;
+                        saveUserDatabase(users);
+                    }
+                }
+            }
+
+            // ========== BARRIER LOGIN SYSTEM ==========
+
+            // Direct barrier login
+            document.getElementById('direct-login').addEventListener('click', function () {
+                const email = document.getElementById('direct-email').value.trim();
+
+                if (!email) {
+                    alert('Please enter your email');
+                    return;
+                }
+
+                const users = getUserDatabase();
+                const user = users[email];
+
+                if (!user) {
+                    alert('Email not found. Please register first.');
+                    return;
+                }
+
+                // Login successful
+                currentUser = {
+                    name: user.name,
+                    role: user.position,
+                    email: user.email,
+                    id: user.email,
+                    progress: user.progress || 0,
+                    acknowledged: user.acknowledged || false,
+                    loginTime: new Date().toISOString()
+                };
+
+                // Hide barrier, show main content
+                document.getElementById('login-barrier').style.display = 'none';
+                document.querySelector('.container').style.display = 'flex';
+
+                // Update user display
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('user-display').style.display = 'flex';
+                document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
+                document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
+
+                showToast(`Welcome back, ${user.name}!`);
+                updateProgressDisplay();
+            });
+
+            // Direct barrier register - SIMPLE FIX
+            document.getElementById('direct-register').addEventListener('click', function () {
+                console.log('Register button clicked!');
+                document.getElementById('registerModal').style.display = 'block';
+            });
+
+            // Registration form submission
+            document.getElementById('register-submit-btn').addEventListener('click', function () {
+                const name = document.getElementById('register-name').value.trim();
+                const email = document.getElementById('register-email').value.trim();
+                const position = document.getElementById('register-position').value;
+                const code = document.getElementById('register-code').value.trim();
+
+                if (!name || !email || !code) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                if (!APPROVED_CODES.includes(code)) {
+                    alert('Invalid registration code. Please contact your manager.');
+                    return;
+                }
+
+                const users = getUserDatabase();
+
+                // Check if user already exists
+                if (users[email]) {
+                    alert('This email is already registered.');
+                    return;
+                }
+
+                // Create new user
+                users[email] = {
+                    name: name,
+                    email: email,
+                    position: position,
+                    status: 'approved',
+                    registeredDate: new Date().toISOString(),
+                    progress: 0,
+                    acknowledged: false
+                };
+
+                saveUserDatabase(users);
+
+                // Auto-login the new user
+                currentUser = {
+                    name: name,
+                    role: position,
+                    email: email,
+                    id: email,
+                    progress: 0,
+                    acknowledged: false,
+                    loginTime: new Date().toISOString()
+                };
+
+                // Hide barrier, show main content
+                document.getElementById('login-barrier').style.display = 'none';
+                document.querySelector('.container').style.display = 'flex';
+
+                // Update UI
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('user-display').style.display = 'flex';
+                document.getElementById('user-display-name').textContent = `${name} (${position})`;
+                document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+                document.getElementById('registerModal').style.display = 'none';
+
+                // Clear form
+                document.getElementById('register-name').value = '';
+                document.getElementById('register-email').value = '';
+                document.getElementById('register-code').value = '';
+
+                showToast(`Welcome to Decades Bar, ${name}!`);
+                updateProgressDisplay();
+            });
+
+            // Logout functionality
+            document.getElementById('logout-btn').addEventListener('click', function () {
+                currentUser = null;
+
+                // Show barrier, hide main content
+                document.getElementById('login-barrier').style.display = 'flex';
+                document.querySelector('.container').style.display = 'none';
+
+                // Reset header
+                document.getElementById('login-section').style.display = 'block';
+                document.getElementById('user-display').style.display = 'none';
+
+                // Clear direct login form
+                document.getElementById('direct-email').value = '';
+
+                showToast('Logged out successfully');
+            });
+
+            // Close modal buttons
+            document.querySelectorAll('.close-modal, .btn-secondary').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    document.getElementById('registerModal').style.display = 'none';
+                });
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function (event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            });
+
+            // Debug info
+            console.log('=== System Ready ===');
+            console.log('Register button:', document.getElementById('direct-register'));
+            console.log('Login button:', document.getElementById('direct-login'));                                   
     </script>
 </body>
 </html>
