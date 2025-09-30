@@ -1707,14 +1707,34 @@
                                     updateProgressDisplay();
                                 };
 
-                                // Update logout to hide main content
-                                logoutBtn.addEventListener('click', function () {
-                                    currentUser = null;
-                                    document.getElementById('login-section').style.display = 'block';
-                                    document.getElementById('user-display').style.display = 'none';
-                                    hideMainContent(); // ← THIS IS THE KEY LINE
-                                    showToast('Logged out successfully');
-                                });
+                                //Logout functionality
+                                    // Fix for Logout button - COMPLETE REWRITE
+                                    document.addEventListener('click', function (event) {
+                                        // Check if logout button was clicked (using event delegation)
+                                        if (event.target.id === 'logout-btn' || event.target.closest('#logout-btn')) {
+                                            console.log('Logout button clicked');
+
+                                            // Reset user
+                                            currentUser = null;
+
+                                            // Reset the header login section
+                                            document.getElementById('login-section').style.display = 'block';
+                                            document.getElementById('user-display').style.display = 'none';
+
+                                            // Hide main content, show barrier
+                                            document.getElementById('login-barrier').style.display = 'flex';
+                                            document.querySelector('.container').style.display = 'none';
+
+                                            // Clear the direct login form
+                                            document.getElementById('direct-email').value = '';
+
+                                            showToast('Logged out successfully');
+
+                                            // Prevent any default behavior
+                                            event.preventDefault();
+                                            return false;
+                                        }
+                                    });
 
                                 // Check if user is already logged in (on page refresh)
                                 window.addEventListener('load', function () {
@@ -1731,6 +1751,23 @@
                                             window.addEventListener('load', function () {
                                                 console.log('Page loaded - barrier should be visible');
                                             });
+                                            
+              // DEBUG: Check why register button isn't working
+                console.log("=== DEBUG REGISTER BUTTON ===");
+                console.log("Register button element:", document.getElementById('direct-register'));
+                console.log("Register modal element:", document.getElementById('registerModal'));
+
+                // Test if we can manually make it work
+                const testRegisterBtn = document.getElementById('direct-register');
+                if (testRegisterBtn) {
+                    console.log("Register button FOUND, testing click...");
+                    testRegisterBtn.onclick = function () {
+                        console.log("Manual onclick worked!");
+                        document.getElementById('registerModal').style.display = 'block';
+                    };
+                } else {
+                    console.log("Register button NOT FOUND - checking HTML...");
+                }                                      
     </script>
 </body>
 </html>
