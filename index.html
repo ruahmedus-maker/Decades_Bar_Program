@@ -478,6 +478,203 @@
             transform: translateY(0);
             opacity: 1;
         }
+
+                /* Login & Registration Styles */
+        .login-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .login-btn:hover {
+            background: #c19b2a;
+        }
+
+        .btn-logout {
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-logout:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        #login-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #user-display {
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .modal-footer {
+            padding: 15px 25px;
+            background-color: #f8f9fa;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .notification {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .notification p {
+            margin: 0;
+            color: #856404;
+        }
+
+        .registration-links {
+            text-align: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .registration-links a {
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .registration-links a:hover {
+            text-decoration: underline;
+        }
+
+        .user-status {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-left: 10px;
+        }
+
+        .user-status.pending {
+            color: #ffc107;
+        }
+
+        .user-status.approved {
+            color: var(--success);
+        }
     </style>
 </head>
 <body>
@@ -502,10 +699,19 @@
         <!-- Main Content -->
         <div class="main-content">
             <div class="header">
-                <h2 id="page-title">Welcome to Decades Bar Resource Center</h2>
+                <h2 id="page-title">Welcome to Bar Resource Center</h2>
                 <div class="user-info">
-                    <div class="avatar">BM</div>
-                    <span>Bar Manager</span>
+                    <!-- This shows when user is NOT logged in -->
+                    <div id="login-section">
+                        <button id="login-btn" class="btn login-btn">Staff Login</button>
+                    </div>
+            
+                    <!-- This shows when user IS logged in -->
+                    <div id="user-display" style="display: none;">
+                        <div class="avatar" id="user-avatar">U</div>
+                        <span id="user-display-name">User</span>
+                        <button id="logout-btn" class="btn-logout">Logout</button>
+                    </div>
                 </div>
             </div>
             
@@ -848,40 +1054,69 @@
             </div>
         </div>
     </div>
-        <!-- Login Modal -->
-        <div class="modal" id="loginModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Staff Login</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="modal-user-name">Full Name</label>
-                        <input type="text" id="modal-user-name" placeholder="Enter your full name">
+            <!-- Login Modal -->
+            <div class="modal" id="loginModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Staff Login</h3>
+                        <button class="close-modal" data-modal="loginModal">&times;</button>
                     </div>
-                    <div class="form-group">
-                        <label for="modal-user-role">Position</label>
-                        <select id="modal-user-role">
-                            <option value="Bartender">Bartender</option>
-                            <option value="Senior Bartender">Senior Bartender</option>
-                            <option value="Bar Manager">Bar Manager</option>
-                            <option value="Manager">Manager</option>
-                            <option value="Trainee">Trainee</option>
-                            <option value="Other">Other</option>
-                        </select>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="modal-user-email">Work Email</label>
+                            <input type="email" id="modal-user-email" placeholder="your.name@decadesbar.com">
+                        </div>
+                        <div class="registration-links">
+                            <p>New employee? <a id="show-register">Register here</a></p>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="modal-user-email">Email (optional)</label>
-                        <input type="email" id="modal-user-email" placeholder="your.email@example.com">
+                    <div class="modal-footer">
+                        <button class="btn-secondary" data-modal="loginModal">Cancel</button>
+                        <button class="btn" id="modal-login-btn">Login</button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-secondary" id="modal-cancel-btn">Cancel</button>
-                    <button class="btn" id="modal-login-btn">Login</button>
                 </div>
             </div>
-        </div>
+            
+            <!-- Registration Modal -->
+            <div class="modal" id="registerModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>New Staff Registration</h3>
+                        <button class="close-modal" data-modal="registerModal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="register-name">Full Name</label>
+                            <input type="text" id="register-name" placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Work Email</label>
+                            <input type="email" id="register-email" placeholder="your.name@decadesbar.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-position">Position</label>
+                            <select id="register-position">
+                                <option value="Bartender">Bartender</option>
+                                <option value="Senior Bartender">Senior Bartender</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Bar Manager">Bar Manager</option>
+                                <option value="Trainee">Trainee</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-code">Registration Code</label>
+                            <input type="password" id="register-code" placeholder="Enter registration code provided by manager">
+                        </div>
+                        <div class="notification">
+                            <p><strong>Note:</strong> Your registration will be pending until approved by management.</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-secondary" data-modal="registerModal">Cancel</button>
+                        <button class="btn" id="register-submit-btn">Submit Registration</button>
+                    </div>
+                </div>
+            </div>
     <!-- Toast Notification -->
     <div class="toast" id="toast">Acknowledgement submitted successfully!</div>
     
@@ -1050,6 +1285,176 @@
                     alert('Please enter your name');
                 }
             });
+
+                    // Registration System
+                        const loginModal = document.getElementById('loginModal');
+                        const registerModal = document.getElementById('registerModal');
+                        const openLoginBtn = document.getElementById('login-btn');
+                        const closeModalBtns = document.querySelectorAll('.close-modal');
+                        const cancelModalBtns = document.querySelectorAll('.btn-secondary');
+                        const modalLoginBtn = document.getElementById('modal-login-btn');
+                        const registerSubmitBtn = document.getElementById('register-submit-btn');
+                        const showRegisterLink = document.getElementById('show-register');
+
+                        // Approved registration codes (you can change these)
+                        const APPROVED_CODES = ["DECADES2024", "BARSTAFF", "MANAGER123"];
+
+                        // User database in localStorage
+                        function getUserDatabase() {
+                            return JSON.parse(localStorage.getItem('decadesBarUsers')) || {};
+                        }
+
+                        function saveUserDatabase(users) {
+                            localStorage.setItem('decadesBarUsers', JSON.stringify(users));
+                        }
+
+                        // Open login modal
+                        openLoginBtn.addEventListener('click', function () {
+                            closeAllModals();
+                            loginModal.style.display = 'block';
+                        });
+
+                        // Open registration modal
+                        showRegisterLink.addEventListener('click', function () {
+                            closeAllModals();
+                            registerModal.style.display = 'block';
+                        });
+
+                        // Close all modals
+                        function closeAllModals() {
+                            document.querySelectorAll('.modal').forEach(modal => {
+                                modal.style.display = 'none';
+                            });
+                        }
+
+                        // Close modal when clicking X or Cancel buttons
+                        closeModalBtns.forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const modalId = this.getAttribute('data-modal');
+                                document.getElementById(modalId).style.display = 'none';
+                            });
+                        });
+
+                        cancelModalBtns.forEach(btn => {
+                            btn.addEventListener('click', function () {
+                                const modalId = this.getAttribute('data-modal');
+                                document.getElementById(modalId).style.display = 'none';
+                            });
+                        });
+
+                        // Close modal when clicking outside
+                        window.addEventListener('click', function (event) {
+                            if (event.target.classList.contains('modal')) {
+                                event.target.style.display = 'none';
+                            }
+                        });
+
+                        // Registration functionality
+                        registerSubmitBtn.addEventListener('click', function () {
+                            const name = document.getElementById('register-name').value.trim();
+                            const email = document.getElementById('register-email').value.trim();
+                            const position = document.getElementById('register-position').value;
+                            const code = document.getElementById('register-code').value.trim();
+
+                            if (!name || !email || !code) {
+                                alert('Please fill in all required fields');
+                                return;
+                            }
+
+                            if (!APPROVED_CODES.includes(code)) {
+                                alert('Invalid registration code. Please contact your manager.');
+                                return;
+                            }
+
+                            const users = getUserDatabase();
+
+                            // Check if user already exists
+                            if (users[email]) {
+                                alert('This email is already registered.');
+                                return;
+                            }
+
+                            // Create new user
+                            users[email] = {
+                                name: name,
+                                email: email,
+                                position: position,
+                                status: 'approved',
+                                registeredDate: new Date().toISOString(),
+                                progress: 0,
+                                acknowledged: false
+                            };
+
+                            saveUserDatabase(users);
+
+                            // Auto-login the new user
+                            currentUser = {
+                                name: name,
+                                role: position,
+                                email: email,
+                                id: email,
+                                progress: 0,
+                                acknowledged: false,
+                                loginTime: new Date().toISOString()
+                            };
+
+                            // Update UI
+                            document.getElementById('login-section').style.display = 'none';
+                            document.getElementById('user-display').style.display = 'flex';
+                            document.getElementById('user-display-name').textContent = `${name} (${position})`;
+                            document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+
+                            closeAllModals();
+                            showToast(`Welcome to Decades Bar, ${name}!`);
+                            updateProgressDisplay();
+                        });
+
+                        // Login functionality
+                        modalLoginBtn.addEventListener('click', function () {
+                            const email = document.getElementById('modal-user-email').value.trim();
+
+                            if (!email) {
+                                alert('Please enter your registered email');
+                                return;
+                            }
+
+                            const users = getUserDatabase();
+                            const user = users[email];
+
+                            if (!user) {
+                                alert('Email not found. Please register first.');
+                                registerModal.style.display = 'block';
+                                return;
+                            }
+
+                            currentUser = {
+                                name: user.name,
+                                role: user.position,
+                                email: user.email,
+                                id: user.email,
+                                progress: user.progress || 0,
+                                acknowledged: user.acknowledged || false,
+                                loginTime: new Date().toISOString()
+                            };
+
+                            // Update UI
+                            document.getElementById('login-section').style.display = 'none';
+                            document.getElementById('user-display').style.display = 'flex';
+                            document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
+                            document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
+
+                            closeAllModals();
+                            showToast(`Welcome back, ${user.name}!`);
+                            updateProgressDisplay();
+                        });
+
+                        // Logout functionality
+                        document.getElementById('logout-btn').addEventListener('click', function () {
+                            currentUser = null;
+                            document.getElementById('login-section').style.display = 'block';
+                            document.getElementById('user-display').style.display = 'none';
+                            showToast('Logged out successfully');
+                        });
     </script>
 </body>
 </html>
