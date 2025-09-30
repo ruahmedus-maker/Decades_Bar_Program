@@ -680,19 +680,38 @@
 <body>
 
     <body>
-        <!-- Login Barrier - Shows until user logs in -->
+    <body>
+        <!-- SIMPLE Login Barrier -->
         <div id="login-barrier"
-            style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a365d, #2d3748); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; text-align: center;">
+            style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a365d, #2d3748); z-index: 9999; display: flex; justify-content: center; align-items: center;">
             <div
-                style="background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); color: #2d3748; max-width: 400px; width: 90%;">
-                <h2 style="color: #1a365d; margin-bottom: 20px;">Decades Bar Training Portal</h2>
-                <p style="margin-bottom: 25px;">Please log in to access the training materials</p>
-                <button id="barrier-login-btn" class="btn"
-                    style="background: #d4af37; color: white; border: none; padding: 12px 30px; border-radius: 5px; font-size: 1.1rem; cursor: pointer; font-weight: bold;">
-                    Staff Login
-                </button>
+                style="background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; max-width: 400px; width: 90%;">
+                <h2 style="color: #1a365d; margin-bottom: 20px;">🔐 Decades Bar Training</h2>
+                <p style="margin-bottom: 25px; color: #2d3748;">Please log in to access the training materials</p>
+    
+                <!-- Direct login form right in the barrier -->
+                <div style="margin-bottom: 20px;">
+                    <input type="email" id="direct-email" placeholder="your.email@decadesbar.com"
+                        style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 5px; margin-bottom: 15px;">
+                    <button id="direct-login"
+                        style="background: #d4af37; color: white; border: none; padding: 12px 30px; border-radius: 5px; font-size: 1.1rem; cursor: pointer; font-weight: bold; width: 100%;">
+                        Login with Email
+                    </button>
+                </div>
+    
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                    <p style="margin-bottom: 15px; color: #6c757d;">New employee?</p>
+                    <button id="direct-register"
+                        style="background: none; border: 2px solid #d4af37; color: #d4af37; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%;">
+                        Register First
+                    </button>
+                </div>
             </div>
         </div>
+    
+        <!-- The rest of your existing content -->
+        <div class="container" style="display: none;">
+            ... your existing content ...
     
     <div class="container" style="display: none;">
         <!-- Sidebar Navigation -->
@@ -1494,25 +1513,61 @@
                         }
                     });
 
-                            // Login Barrier Functionality
-                                const loginBarrier = document.getElementById('login-barrier');
-                                    const barrierLoginBtn = document.getElementById('barrier-login-btn');
-                                    const mainContainer = document.querySelector('.container');
+                                    // Direct barrier login functionality
+                                        const directLoginBtn = document.getElementById('direct-login');
+                                        const directRegisterBtn = document.getElementById('direct-register');
 
-                                    // Show login modal when barrier login button is clicked - FIXED VERSION
-                                    if (barrierLoginBtn) {
-                                        barrierLoginBtn.addEventListener('click', function () {
-                                            console.log('Barrier login button clicked'); // Debug line
-                                            if (loginModal) {
-                                                loginModal.style.display = 'block';
-                                            } else {
-                                                console.error('loginModal not found');
-                                            }
-                                        });
-                                    } else {
-                                        console.error('barrierLoginBtn not found');
-                                    }
+                                        if (directLoginBtn) {
+                                            directLoginBtn.addEventListener('click', function () {
+                                                const email = document.getElementById('direct-email').value.trim();
 
+                                                if (!email) {
+                                                    alert('Please enter your email');
+                                                    return;
+                                                }
+
+                                                const users = getUserDatabase();
+                                                const user = users[email];
+
+                                                if (!user) {
+                                                    alert('Email not found. Please register first.');
+                                                    return;
+                                                }
+
+                                                // Login successful
+                                                currentUser = {
+                                                    name: user.name,
+                                                    role: user.position,
+                                                    email: user.email,
+                                                    id: user.email,
+                                                    progress: user.progress || 0,
+                                                    acknowledged: user.acknowledged || false,
+                                                    loginTime: new Date().toISOString()
+                                                };
+
+                                                // Update UI and show main content
+                                                document.getElementById('login-section').style.display = 'none';
+                                                document.getElementById('user-display').style.display = 'flex';
+                                                document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
+                                                document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
+
+                                                // Hide barrier, show main content
+                                                document.getElementById('login-barrier').style.display = 'none';
+                                                document.querySelector('.container').style.display = 'flex';
+
+                                                showToast(`Welcome back, ${user.name}!`);
+                                                updateProgressDisplay();
+                                            });
+                                        }
+
+                                        if (directRegisterBtn) {
+                                            directRegisterBtn.addEventListener('click', function () {
+                                                // Show registration modal
+                                                if (registerModal) {
+                                                    registerModal.style.display = 'block';
+                                                }
+                                            });
+                                        }
                                 // Function to show main content after login
                                 function showMainContent() {
                                     loginBarrier.style.display = 'none';
