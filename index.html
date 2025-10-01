@@ -836,6 +836,8 @@
                 <div style="margin-bottom: 20px;">
                     <input type="email" id="direct-email" placeholder="your.email@domain.com"
                         style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 5px; margin-bottom: 15px;">
+                <input type="password" id="direct-password" placeholder="Your password"
+                    style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 5px; margin-bottom: 15px;">
                     <button id="direct-login"
                         style="background: #d4af37; color: white; border: none; padding: 12px 30px; border-radius: 5px; font-size: 1.1rem; cursor: pointer; font-weight: bold; width: 100%;">
                         Login with Email
@@ -3335,6 +3337,16 @@
                             <input type="email" id="register-email" placeholder="your.name@decadesbar.com">
                         </div>
                         <div class="form-group">
+                            <label for="register-password">Create Password</label>
+                            <input type="password" id="register-password" placeholder="Minimum 6 characters" minlength="6">
+                        </div>
+                        <div id="password-strength" style="margin-top: 5px; font-size: 0.8rem; min-height: 20px;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-confirm-password">Confirm Password</label>
+                            <input type="password" id="register-confirm-password" placeholder="Re-enter your password">
+                        </div>
+                        <div class="form-group">
                             <label for="register-position">Position</label>
                             <select id="register-position">
                                 <option value="Bartender">Bartender</option>
@@ -3458,171 +3470,369 @@
 
                             // ========== BARRIER LOGIN SYSTEM ONLY ==========
 
-                            // User management
-                            let currentUser = null;
-                            const APPROVED_CODES = ["DECADES2025", "BARSTAFF", "MANAGER123"];
+                            // Enhanced Security Configuration
+                                const SECURITY_CONFIG = {
+                                    maxLoginAttempts: 5,
+                                    lockoutTime: 15 * 60 * 1000, // 15 minutes
+                                    sessionTimeout: 8 * 60 * 60 * 1000, // 8 hours
+                                    passwordMinLength: 6
+                                };
 
-                            // User database functions
-                            function getUserDatabase() {
-                                return JSON.parse(localStorage.getItem('decadesBarUsers')) || {};
-                            }
+                                function validatePasswordStrength(password) {
+                                        const requirements = {
+                                            length: password.length >= 6,
+                                            hasNumber: /\d/.test(password),
+                                            hasLetter: /[a-zA-Z]/.test(password)
+                                        };
 
-                            function saveUserDatabase(users) {
-                                localStorage.setItem('decadesBarUsers', JSON.stringify(users));
-                            }
+                                        if (!requirements.length) return 'Password must be at least 6 characters';
+                                        if (!requirements.hasNumber) return 'Password must contain at least one number';
+                                        if (!requirements.hasLetter) return 'Password must contain at least one letter';
+                                        return null;
+                                    }
 
-                            // Toast function
-                            function showToast(message) {
-                                toast.textContent = message;
-                                toast.classList.add('show');
-                                setTimeout(() => {
-                                    toast.classList.remove('show');
-                                }, 3000);
-                            }
 
-                            // Update progress display
-                            function updateProgressDisplay() {
-                                if (currentUser) {
-                                    progressFill.style.width = `${currentUser.progress}%`;
-                                    progressText.textContent = `${currentUser.progress}% Complete`;
+                                // Enhanced User Management
+                                let currentUser = null;
+                                let loginAttempts = JSON.parse(localStorage.getItem('loginAttempts')) || {};
 
-                                    acknowledgementCheckbox.checked = currentUser.acknowledged;
+                                // Improved password hashing (basic obfuscation)
+                                function hashPassword(password) {
+                                    // Simple hashing for demonstration - in production use proper bcrypt
+                                    let hash = 0;
+                                    for (let i = 0; i < password.length; i++) {
+                                        const char = password.charCodeAt(i);
+                                        hash = ((hash << 5) - hash) + char;
+                                        hash = hash & hash; // Convert to 32bit integer
+                                    }
+                                    return hash.toString();
+                                }
 
-                                    if (currentUser.acknowledged) {
-                                        submitBtn.disabled = true;
-                                        submitBtn.textContent = 'Acknowledgement Submitted';
-                                        submitBtn.style.backgroundColor = '#a0aec0';
-                                    } else {
-                                        submitBtn.disabled = false;
-                                        submitBtn.textContent = 'Submit Acknowledgement';
-                                        submitBtn.style.backgroundColor = '';
+                                // Improved user database functions
+                                function getUserDatabase() {
+                                    const encrypted = localStorage.getItem('decadesBarUsers');
+                                    if (!encrypted) return {};
+
+                                    try {
+                                        // Basic obfuscation - decode from base64
+                                        const decoded = atob(encrypted);
+                                        return JSON.parse(decoded);
+                                    } catch (e) {
+                                        console.error('Error reading user database');
+                                        return {};
                                     }
                                 }
-                            }
 
-                            // ========== BARRIER BUTTONS - SIMPLE & GUARANTEED ==========
-
-                            // Direct barrier login
-                            document.getElementById('direct-login').addEventListener('click', function () {
-                                const email = document.getElementById('direct-email').value.trim();
-
-                                if (!email) {
-                                    alert('Please enter your email');
-                                    return;
+                                function saveUserDatabase(users) {
+                                    try {
+                                        // Basic obfuscation - encode to base64
+                                        const encoded = btoa(JSON.stringify(users));
+                                        localStorage.setItem('decadesBarUsers', encoded);
+                                    } catch (e) {
+                                        console.error('Error saving user database');
+                                    }
                                 }
 
-                                const users = getUserDatabase();
-                                const user = users[email];
-
-                                if (!user) {
-                                    alert('Email not found. Please register first.');
-                                    return;
+                                // Session management
+                                function startUserSession(user) {
+                                    currentUser = user;
+                                    localStorage.setItem('currentSession', JSON.stringify({
+                                        user: user,
+                                        loginTime: new Date().toISOString(),
+                                        expires: new Date(Date.now() + SECURITY_CONFIG.sessionTimeout).toISOString()
+                                    }));
                                 }
 
-                                // Login successful
-                                currentUser = {
-                                    name: user.name,
-                                    role: user.position,
-                                    email: user.email,
-                                    id: user.email,
-                                    progress: user.progress || 0,
-                                    acknowledged: user.acknowledged || false,
-                                    loginTime: new Date().toISOString()
-                                };
+                                function validateSession() {
+                                    const session = localStorage.getItem('currentSession');
+                                    if (!session) return false;
 
-                                // Hide barrier, show main content
-                                document.getElementById('login-barrier').style.display = 'none';
-                                document.querySelector('.container').style.display = 'flex';
-
-                                // Update user display
-                                document.getElementById('login-section').style.display = 'none';
-                                document.getElementById('user-display').style.display = 'flex';
-                                document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
-                                document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
-
-                                showToast(`Welcome back, ${user.name}!`);
-                                updateProgressDisplay();
-                            });
-
-                            function openRegisterModal() {
-                                    console.log('openRegisterModal called');
-                                    document.getElementById('registerModal').style.display = 'block';
+                                    try {
+                                        const sessionData = JSON.parse(session);
+                                        if (new Date(sessionData.expires) < new Date()) {
+                                            endUserSession();
+                                            return false;
+                                        }
+                                        return sessionData.user;
+                                    } catch (e) {
+                                        return false;
+                                    }
                                 }
 
-                            // Direct barrier register - ULTRA SIMPLE
-                            // document.getElementById('direct-register').addEventListener('click', function () {
-                            //     console.log('Register button clicked - opening modal');
-                            //     document.getElementById('registerModal').style.display = 'block';
-                            // });
-
-                            // Registration form submission
-                            document.getElementById('register-submit-btn').addEventListener('click', function () {
-                                const name = document.getElementById('register-name').value.trim();
-                                const email = document.getElementById('register-email').value.trim();
-                                const position = document.getElementById('register-position').value;
-                                const code = document.getElementById('register-code').value.trim();
-
-                                if (!name || !email || !code) {
-                                    alert('Please fill in all required fields');
-                                    return;
+                                function endUserSession() {
+                                    currentUser = null;
+                                    localStorage.removeItem('currentSession');
                                 }
 
-                                if (!APPROVED_CODES.includes(code)) {
-                                    alert('Invalid registration code. Please contact your manager.');
-                                    return;
+                                // Login attempt tracking
+                                function trackLoginAttempt(email, success) {
+                                    if (!loginAttempts[email]) {
+                                        loginAttempts[email] = { count: 0, lastAttempt: null, lockedUntil: null };
+                                    }
+
+                                    if (success) {
+                                        loginAttempts[email].count = 0;
+                                        loginAttempts[email].lockedUntil = null;
+                                    } else {
+                                        loginAttempts[email].count++;
+                                        loginAttempts[email].lastAttempt = new Date().toISOString();
+
+                                        if (loginAttempts[email].count >= SECURITY_CONFIG.maxLoginAttempts) {
+                                            loginAttempts[email].lockedUntil = new Date(Date.now() + SECURITY_CONFIG.lockoutTime).toISOString();
+                                        }
+                                    }
+
+                                    localStorage.setItem('loginAttempts', JSON.stringify(loginAttempts));
                                 }
 
-                                const users = getUserDatabase();
+                                function isAccountLocked(email) {
+                                    const attempt = loginAttempts[email];
+                                    if (!attempt || !attempt.lockedUntil) return false;
 
-                                // Check if user already exists
-                                if (users[email]) {
-                                    alert('This email is already registered.');
-                                    return;
+                                    if (new Date(attempt.lockedUntil) > new Date()) {
+                                        return true;
+                                    } else {
+                                        // Lockout period expired
+                                        attempt.lockedUntil = null;
+                                        attempt.count = 0;
+                                        return false;
+                                    }
                                 }
 
-                                // Create new user
-                                users[email] = {
-                                    name: name,
-                                    email: email,
-                                    position: position,
-                                    status: 'approved',
-                                    registeredDate: new Date().toISOString(),
-                                    progress: 0,
-                                    acknowledged: false
-                                };
+                                // Enhanced login function
+                                async function performLogin(email, password) {
+                                    // Input validation
+                                    if (!email || !password) {
+                                        throw new Error('Please enter both email and password');
+                                    }
 
-                                saveUserDatabase(users);
+                                    // Check if account is locked
+                                    if (isAccountLocked(email)) {
+                                        throw new Error('Account temporarily locked due to too many failed attempts. Please try again in 15 minutes.');
+                                    }
 
-                                // Auto-login the new user
-                                currentUser = {
-                                    name: name,
-                                    role: position,
-                                    email: email,
-                                    id: email,
-                                    progress: 0,
-                                    acknowledged: false,
-                                    loginTime: new Date().toISOString()
-                                };
+                                    const users = getUserDatabase();
+                                    const user = users[email];
 
-                                // Hide barrier, show main content
-                                document.getElementById('login-barrier').style.display = 'none';
-                                document.querySelector('.container').style.display = 'flex';
+                                    if (!user) {
+                                        trackLoginAttempt(email, false);
+                                        throw new Error('Invalid email or password');
+                                    }
 
-                                // Update UI
-                                document.getElementById('login-section').style.display = 'none';
-                                document.getElementById('user-display').style.display = 'flex';
-                                document.getElementById('user-display-name').textContent = `${name} (${position})`;
-                                document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
-                                document.getElementById('registerModal').style.display = 'none';
+                                    // Verify password
+                                    const hashedPassword = hashPassword(password);
+                                    if (user.passwordHash !== hashedPassword) {
+                                        trackLoginAttempt(email, false);
+                                        throw new Error('Invalid email or password');
+                                    }
 
-                                // Clear form
-                                document.getElementById('register-name').value = '';
-                                document.getElementById('register-email').value = '';
-                                document.getElementById('register-code').value = '';
+                                    // Successful login
+                                    trackLoginAttempt(email, true);
+                                    return user;
+                                }
 
-                                showToast(`Welcome to Decades Bar, ${name}!`);
-                                updateProgressDisplay();
-                            });
+                                // Enhanced registration function
+                                async function performRegistration(userData) {
+                                    const { name, email, position, code, password, confirmPassword } = userData;
+
+                                    // Validation
+                                    if (!name || !email || !position || !code || !password || !confirmPassword) {
+                                        throw new Error('Please fill in all fields');
+                                    }
+
+                                    if (password !== confirmPassword) {
+                                        throw new Error('Passwords do not match');
+                                    }
+
+                                    const strengthError = validatePasswordStrength(password);
+                                    if (strengthError) {
+                                        throw new Error(strengthError);
+                                    }
+
+                                    if (!APPROVED_CODES.includes(code)) {
+                                        throw new Error('Invalid registration code');
+                                    }
+
+                                    const users = getUserDatabase();
+
+                                    if (users[email]) {
+                                        throw new Error('This email is already registered');
+                                    }
+
+                                    // Create new user with hashed password
+                                    users[email] = {
+                                        name: name,
+                                        email: email,
+                                        position: position,
+                                        status: 'approved',
+                                        registeredDate: new Date().toISOString(),
+                                        progress: 0,
+                                        acknowledged: false,
+                                        passwordHash: hashPassword(password)
+                                    };
+
+                                    saveUserDatabase(users);
+                                    return users[email];
+                                }
+
+                                // Real-time password strength (place with registration event listeners)
+                                    document.getElementById('register-password').addEventListener('input', function () {
+                                        const password = this.value;
+                                        const strengthElement = document.getElementById('password-strength');
+
+                                        if (!strengthElement) return;
+
+                                        if (password.length === 0) {
+                                            strengthElement.textContent = '';
+                                            return;
+                                        }
+
+                                        const strengthError = validatePasswordStrength(password);
+                                        if (strengthError) {
+                                            strengthElement.textContent = strengthError;
+                                            strengthElement.style.color = '#e53e3e';
+                                        } else {
+                                            strengthElement.textContent = '✓ Password strength: Good';
+                                            strengthElement.style.color = '#38a169';
+                                        }
+                                    });
+
+                                    // Password matching indicator
+                                    document.getElementById('register-confirm-password').addEventListener('input', function () {
+                                        const password = document.getElementById('register-password').value;
+                                        const confirmPassword = this.value;
+                                        const strengthElement = document.getElementById('password-strength');
+
+                                        if (!strengthElement) return;
+
+                                        if (confirmPassword.length === 0) {
+                                            return;
+                                        }
+
+                                        if (password !== confirmPassword) {
+                                            strengthElement.textContent = '✗ Passwords do not match';
+                                            strengthElement.style.color = '#e53e3e';
+                                        } else if (password.length > 0) {
+                                            const strengthError = validatePasswordStrength(password);
+                                            if (!strengthError) {
+                                                strengthElement.textContent = '✓ Passwords match and are strong';
+                                                strengthElement.style.color = '#38a169';
+                                            }
+                                        }
+                                    });
+
+                                // Update the direct login event listener
+                                document.getElementById('direct-login').addEventListener('click', async function () {
+                                    const email = document.getElementById('direct-email').value.trim();
+                                    const password = document.getElementById('direct-password').value;
+
+                                    try {
+                                        const user = await performLogin(email, password);
+
+                                        // Login successful
+                                        startUserSession({
+                                            name: user.name,
+                                            role: user.position,
+                                            email: user.email,
+                                            id: user.email,
+                                            progress: user.progress || 0,
+                                            acknowledged: user.acknowledged || false,
+                                            loginTime: new Date().toISOString()
+                                        });
+
+                                        // Hide barrier, show main content
+                                        document.getElementById('login-barrier').style.display = 'none';
+                                        document.querySelector('.container').style.display = 'flex';
+
+                                        // Update UI
+                                        document.getElementById('login-section').style.display = 'none';
+                                        document.getElementById('user-display').style.display = 'flex';
+                                        document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
+                                        document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
+
+                                        showToast(`Welcome back, ${user.name}!`);
+                                        updateProgressDisplay();
+
+                                    } catch (error) {
+                                        alert(error.message);
+                                    }
+                                });
+
+                                // Update registration submission
+                                document.getElementById('register-submit-btn').addEventListener('click', async function () {
+                                    const name = document.getElementById('register-name').value.trim();
+                                    const email = document.getElementById('register-email').value.trim();
+                                    const position = document.getElementById('register-position').value;
+                                    const code = document.getElementById('register-code').value.trim();
+                                    const password = document.getElementById('register-password').value;
+                                    const confirmPassword = document.getElementById('register-confirm-password').value;
+
+                                    try {
+                                        const user = await performRegistration({
+                                            name, email, position, code, password, confirmPassword
+                                        });
+
+                                        // Auto-login after registration
+                                        startUserSession({
+                                            name: user.name,
+                                            role: user.position,
+                                            email: user.email,
+                                            id: user.email,
+                                            progress: 0,
+                                            acknowledged: false,
+                                            loginTime: new Date().toISOString()
+                                        });
+
+                                        // Hide barrier, show main content
+                                        document.getElementById('login-barrier').style.display = 'none';
+                                        document.querySelector('.container').style.display = 'flex';
+
+                                        // Update UI
+                                        document.getElementById('login-section').style.display = 'none';
+                                        document.getElementById('user-display').style.display = 'flex';
+                                        document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
+                                        document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
+                                        document.getElementById('registerModal').style.display = 'none';
+
+                                        // Clear form
+                                        document.getElementById('register-name').value = '';
+                                        document.getElementById('register-email').value = '';
+                                        document.getElementById('register-position').selectedIndex = 0;
+                                        document.getElementById('register-code').value = '';
+                                        document.getElementById('register-password').value = '';
+                                        document.getElementById('register-confirm-password').value = '';
+
+                                        showToast(`Welcome to the Decades Bar Portal, ${user.name}!`);
+                                        updateProgressDisplay();
+
+                                    } catch (error) {
+                                        alert(error.message);
+                                    }
+                                });
+
+                                // Session validation on page load
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const validSession = validateSession();
+                                    if (validSession) {
+                                        currentUser = validSession;
+                                        document.getElementById('login-barrier').style.display = 'none';
+                                        document.querySelector('.container').style.display = 'flex';
+                                        document.getElementById('login-section').style.display = 'none';
+                                        document.getElementById('user-display').style.display = 'flex';
+                                        document.getElementById('user-display-name').textContent = `${validSession.name} (${validSession.role})`;
+                                        document.getElementById('user-avatar').textContent = validSession.name.charAt(0).toUpperCase();
+                                        updateProgressDisplay();
+                                    }
+                                });
+
+                                // Auto-logout after session timeout
+                                setInterval(() => {
+                                    if (currentUser && !validateSession()) {
+                                        alert('Your session has expired. Please log in again.');
+                                        endUserSession();
+                                        location.reload();
+                                    }
+                                }, 60000); // Check every minute
 
                             // Logout functionality
                             document.getElementById('logout-btn').addEventListener('click', function () {
