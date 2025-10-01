@@ -3675,52 +3675,7 @@
                                     return users[email];
                                 }
 
-                                // Real-time password strength (place with registration event listeners)
-                                    document.getElementById('register-password').addEventListener('input', function () {
-                                        const password = this.value;
-                                        const strengthElement = document.getElementById('password-strength');
-
-                                        if (!strengthElement) return;
-
-                                        if (password.length === 0) {
-                                            strengthElement.textContent = '';
-                                            return;
-                                        }
-
-                                        const strengthError = validatePasswordStrength(password);
-                                        if (strengthError) {
-                                            strengthElement.textContent = strengthError;
-                                            strengthElement.style.color = '#e53e3e';
-                                        } else {
-                                            strengthElement.textContent = '✓ Password strength: Good';
-                                            strengthElement.style.color = '#38a169';
-                                        }
-                                    });
-
-                                    // Password matching indicator
-                                    document.getElementById('register-confirm-password').addEventListener('input', function () {
-                                        const password = document.getElementById('register-password').value;
-                                        const confirmPassword = this.value;
-                                        const strengthElement = document.getElementById('password-strength');
-
-                                        if (!strengthElement) return;
-
-                                        if (confirmPassword.length === 0) {
-                                            return;
-                                        }
-
-                                        if (password !== confirmPassword) {
-                                            strengthElement.textContent = '✗ Passwords do not match';
-                                            strengthElement.style.color = '#e53e3e';
-                                        } else if (password.length > 0) {
-                                            const strengthError = validatePasswordStrength(password);
-                                            if (!strengthError) {
-                                                strengthElement.textContent = '✓ Passwords match and are strong';
-                                                strengthElement.style.color = '#38a169';
-                                            }
-                                        }
-                                    });
-
+                                
                                 // Update the direct login event listener
                                 document.getElementById('direct-login').addEventListener('click', async function () {
                                     const email = document.getElementById('direct-email').value.trim();
@@ -3809,6 +3764,53 @@
                                         alert(error.message);
                                     }
                                 });
+
+                                // Real-time password strength (place with registration event listeners)
+                                    document.getElementById('register-password').addEventListener('input', function () {
+                                        const password = this.value;
+                                        const strengthElement = document.getElementById('password-strength');
+
+                                        if (!strengthElement) return;
+
+                                        if (password.length === 0) {
+                                            strengthElement.textContent = '';
+                                            return;
+                                        }
+
+                                        const strengthError = validatePasswordStrength(password);
+                                        if (strengthError) {
+                                            strengthElement.textContent = strengthError;
+                                            strengthElement.style.color = '#e53e3e';
+                                        } else {
+                                            strengthElement.textContent = '✓ Password strength: Good';
+                                            strengthElement.style.color = '#38a169';
+                                        }
+                                    });
+
+                                    // Password matching indicator
+                                    document.getElementById('register-confirm-password').addEventListener('input', function () {
+                                        const password = document.getElementById('register-password').value;
+                                        const confirmPassword = this.value;
+                                        const strengthElement = document.getElementById('password-strength');
+
+                                        if (!strengthElement) return;
+
+                                        if (confirmPassword.length === 0) {
+                                            return;
+                                        }
+
+                                        if (password !== confirmPassword) {
+                                            strengthElement.textContent = '✗ Passwords do not match';
+                                            strengthElement.style.color = '#e53e3e';
+                                        } else if (password.length > 0) {
+                                            const strengthError = validatePasswordStrength(password);
+                                            if (!strengthError) {
+                                                strengthElement.textContent = '✓ Passwords match and are strong';
+                                                strengthElement.style.color = '#38a169';
+                                            }
+                                        }
+                                    });
+
 
                                 // Session validation on page load
                                 document.addEventListener('DOMContentLoaded', function () {
