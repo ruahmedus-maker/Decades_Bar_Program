@@ -3486,18 +3486,14 @@
                                     passwordMinLength: 6
                                 };
 
-                                // If using position-based codes, use this version:
-                                    const APPROVED_CODES = {
-                                        // Employee codes
-                                        "DECADES2025": ["Trainee"],
-                                        "BARSTAFF2025": ["Bartender"],
-
-                                        // Manager codes (these create admin users)
-                                        "MANAGER2025": ["Manager"],
-                                        "DECADESADMIN": ["Admin"],
-
-                                    }
-
+                                // Use this SIMPLE array version - replace your current APPROVED_CODES
+                                    const APPROVED_CODES = [
+                                        "DECADES2025",      // General staff code
+                                        "BARSTAFF2025",     // Bartender specific  
+                                        "MANAGER2025",      // Manager level
+                                        "DECADESADMIN",     // Admin/owner level
+                                        
+                                    ];
                                 function validatePasswordStrength(password) {
                                         const requirements = {
                                             length: password.length >= 6,
@@ -3677,12 +3673,7 @@
                                     }
                                     
                                     if (!APPROVED_CODES.includes(code)) {
-                                        throw new Error('Invalid registration code');
-                                    }
-
-                                    // Additionally, check if the selected position is allowed for this code
-                                    if (!APPROVED_CODES[code].includes(position)) {
-                                        throw new Error('Invalid position for this registration code.');
+                                        throw new Error('Invalid registration code. Please contact your manager.');
                                     }
 
                                     const users = getUserDatabase();
