@@ -3864,12 +3864,22 @@
                                 });
                             });
 
-                            // Close modal when clicking outside
-                            window.addEventListener('click', function (event) {
-                                if (event.target.classList.contains('modal')) {
-                                    event.target.style.display = 'none';
-                                }
-                            });
+                            // Close modal only with close buttons, not outside clicks
+                                document.querySelectorAll('.close-modal, .btn-secondary').forEach(btn => {
+                                    btn.addEventListener('click', function () {
+                                        const modalId = this.getAttribute('data-modal');
+                                        if (modalId) {
+                                            document.getElementById(modalId).style.display = 'none';
+                                        }
+                                    });
+                                });
+
+                                // Remove or comment out the outside click closing entirely
+                                // window.addEventListener('click', function (event) {
+                                //     if (event.target.classList.contains('modal')) {
+                                //         event.target.style.display = 'none';
+                                //     }
+                                // });
 
                             // Ensure all modals are closed when page loads
                             window.addEventListener('load', function () {
