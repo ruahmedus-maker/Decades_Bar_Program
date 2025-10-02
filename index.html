@@ -3726,7 +3726,7 @@
     // ========== ADMIN FUNCTIONS ==========
         function isAdmin(user) {
             if (!user) return false;
-            const adminPositions = ['Manager', 'Bar Manager', 'General Manager', 'Owner'];
+            const adminPositions = ['Admin'];
             return adminPositions.includes(user.position);
         }
 
