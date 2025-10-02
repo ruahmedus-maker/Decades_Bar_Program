@@ -3416,7 +3416,7 @@
                             <label for="register-position">Position</label>
                             <select id="register-position">
                                 <option value="Bartender">Bartender</option>
-                                <option value="Admin">Admin</option>
+                                <option value="Admin"style="color: #d4af37; font-weight: bold;">Admin ⚠️ (Admin Code Required)</option>
                                 <option value="Manager">Manager</option>
                                 <option value="Trainee">Trainee</option>
                             </select>
@@ -3610,25 +3610,41 @@
     }
 
     function validateSession() {
-        const session = localStorage.getItem('currentSession');
-        if (!session) return false;
+            const session = localStorage.getItem('currentSession');
+            if (!session) return false;
 
-        try {
-            const sessionData = JSON.parse(session);
-            if (new Date(sessionData.expires) < new Date()) {
+            try {
+                const sessionData = JSON.parse(session);
+
+                // Check if session is expired
+                if (new Date(sessionData.expires) < new Date()) {
+                    console.log('Session expired');
+                    endUserSession();
+                    return false;
+                }
+
+                // Verify user still exists in database
+                const users = getUserDatabase();
+                if (!users[sessionData.user.email]) {
+                    console.log('User no longer exists in database');
+                    endUserSession();
+                    return false;
+                }
+
+                return sessionData.user;
+            } catch (e) {
+                console.log('Invalid session data');
                 endUserSession();
                 return false;
             }
-            return sessionData.user;
-        } catch (e) {
-            return false;
         }
-    }
 
     function endUserSession() {
-        currentUser = null;
-        localStorage.removeItem('currentSession');
-    }
+            currentUser = null;
+            localStorage.removeItem('currentSession');
+            // Also clear any other session-related data
+            localStorage.removeItem('loginAttempts');
+        }
 
     // ========== LOGIN/REGISTRATION FUNCTIONS ==========
     async function performLogin(email, password) {
@@ -3656,48 +3672,83 @@
     }
 
     async function performRegistration(userData) {
-        const { name, email, position, code, password, confirmPassword } = userData;
+            const { name, email, position, code, password, confirmPassword } = userData;
 
-        if (!name || !email || !position || !code || !password || !confirmPassword) {
-            throw new Error('Please fill in all fields');
+            // Basic validation
+            if (!name || !email || !position || !code || !password || !confirmPassword) {
+                throw new Error('Please fill in all fields');
+            }
+
+            if (password !== confirmPassword) {
+                throw new Error('Passwords do not match');
+            }
+
+            const strengthError = validatePasswordStrength(password);
+            if (strengthError) {
+                throw new Error(strengthError);
+            }
+
+            if (!APPROVED_CODES.includes(code)) {
+                throw new Error('Invalid registration code. Please contact your manager.');
+            }
+
+            // === ADMIN REGISTRATION SAFEGUARDS ===
+            const adminPositions = ['Admin'];
+            const regularPositions = ['Manager', 'Bartender','Trainee'];
+
+            // Check if user is trying to register an admin position
+            if (adminPositions.includes(position)) {
+                // Only these codes can create admin users
+                const adminOnlyCodes = ['MANAGER2024', 'DECADESADMIN'];
+
+                if (!adminOnlyCodes.includes(code)) {
+                    throw new Error('Administrative positions require manager authorization codes. Please use MANAGER2024 or DECADESADMIN.');
+                }
+
+                // Additional security: Check if any admin already exists
+                const users = getUserDatabase();
+                const existingAdmins = Object.values(users).filter(user =>
+                    adminPositions.includes(user.position)
+                );
+
+                if (existingAdmins.length > 0) {
+                    throw new Error('Administrative account already exists. Please contact the current manager for access.');
+                }
+            }
+
+            // Prevent regular codes from creating admin positions
+            if (adminPositions.includes(position)) {
+                const regularCodes = ['DECADES2024', 'BARSTAFF2024', 'ADMIN'];
+                if (regularCodes.includes(code)) {
+                    throw new Error('This registration code cannot be used for administrative positions. Please use a manager authorization code.');
+                }
+            }
+            // === END SAFEGUARDS ===
+
+            const users = getUserDatabase();
+
+            // Check if user already exists
+            if (users[email]) {
+                throw new Error('This email is already registered.');
+            }
+
+            // Create new user
+            users[email] = {
+                name: name,
+                email: email,
+                position: position,
+                status: 'active',
+                registeredDate: new Date().toISOString(),
+                progress: 0,
+                acknowledged: false,
+                passwordHash: hashPassword(password),
+                loginCount: 0,
+                lastActive: new Date().toISOString()
+            };
+
+            saveUserDatabase(users);
+            return users[email];
         }
-
-        if (password !== confirmPassword) {
-            throw new Error('Passwords do not match');
-        }
-
-        const strengthError = validatePasswordStrength(password);
-        if (strengthError) {
-            throw new Error(strengthError);
-        }
-
-        if (!APPROVED_CODES.includes(code)) {
-            throw new Error('Invalid registration code. Please contact your manager.');
-        }
-
-        const users = getUserDatabase();
-
-        if (users[email]) {
-            throw new Error('This email is already registered.');
-        }
-
-        users[email] = {
-            name: name,
-            email: email,
-            position: position,
-            status: 'active',
-            registeredDate: new Date().toISOString(),
-            progress: 0,
-            acknowledged: false,
-            passwordHash: hashPassword(password),
-            loginCount: 0,
-            lastActive: new Date().toISOString()
-        };
-
-        saveUserDatabase(users);
-        return users[email];
-    }
-
     // ========== MODAL FUNCTIONS ==========
 
     // Update your closeAllModals function to clear forms
@@ -3725,11 +3776,24 @@
 
     // ========== ADMIN FUNCTIONS ==========
         function isAdmin(user) {
-            if (!user) return false;
-            const adminPositions = ['Admin'];
-            return adminPositions.includes(user.position);
-        }
+                if (!user) {
+                    console.log('isAdmin: No user provided');
+                    return false;
+                }
 
+                // Check both position and role fields
+                const userPosition = user.position || user.role || '';
+                const adminPositions = ['Admin'];
+                const isUserAdmin = adminPositions.includes(userPosition);
+
+                console.log('Admin check:', {
+                    name: user.name,
+                    position: userPosition,
+                    isAdmin: isUserAdmin
+                });
+
+                return isUserAdmin;
+            }
         function refreshAdminData() {
             if (!currentUser || !isAdmin(currentUser)) {
                 alert('Admin access required');
@@ -4168,6 +4232,58 @@
             }
         });
 
+         // Position validation when position changes
+        document.getElementById('register-position').addEventListener('change', function () {
+            const position = this.value;
+            const codeInput = document.getElementById('register-code');
+            const adminPositions = ['Manager', 'Bar Manager', 'General Manager', 'Owner', 'Admin'];
+
+            if (adminPositions.includes(position)) {
+                // Show warning for admin positions
+                codeInput.placeholder = "MANAGER2024 or DECADESADMIN required";
+                codeInput.style.borderColor = '#d4af37';
+                codeInput.style.backgroundColor = '#fffaf0';
+            } else {
+                // Reset for regular positions
+                codeInput.placeholder = "Enter registration code provided by manager";
+                codeInput.style.borderColor = '';
+                codeInput.style.backgroundColor = '';
+            }
+        });
+
+        // Code validation with position matching
+        document.getElementById('register-code').addEventListener('input', function () {
+            const code = this.value.trim();
+            const position = document.getElementById('register-position').value;
+            const adminPositions = ['Manager', 'Bar Manager', 'General Manager', 'Owner', 'Admin'];
+
+            if (code.length > 0) {
+                if (adminPositions.includes(position)) {
+                    const adminCodes = ['MANAGER2024', 'DECADESADMIN'];
+                    if (!adminCodes.includes(code)) {
+                        this.style.borderColor = '#e53e3e';
+                        this.title = 'Admin positions require MANAGER2024 or DECADESADMIN codes';
+                    } else {
+                        this.style.borderColor = '#38a169';
+                        this.title = 'Valid admin code';
+                    }
+                } else {
+                    // Regular position code validation
+                    if (!APPROVED_CODES.includes(code)) {
+                        this.style.borderColor = '#e53e3e';
+                        this.title = 'Invalid registration code';
+                    } else {
+                        this.style.borderColor = '#38a169';
+                        this.title = 'Valid registration code';
+                    }
+                }
+            } else {
+                this.style.borderColor = '';
+                this.title = '';
+            }
+        });
+
+
         // Modal controls
         document.querySelectorAll('.close-modal, .btn-secondary').forEach(btn => {
             btn.addEventListener('click', function () {
@@ -4184,7 +4300,7 @@
         // Logout functionality
         
         document.getElementById('logout-btn').addEventListener('click', function () {
-            currentUser = null;
+            endUserSession();
 
             // Clear all login/registration forms
             document.getElementById('direct-email').value = '';
@@ -4206,6 +4322,10 @@
             setupAdminMenu();
 
             showToast('Logged out successfully');
+
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
         });
 
         // Check for existing session
