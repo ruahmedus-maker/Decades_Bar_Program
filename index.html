@@ -3379,7 +3379,7 @@
                 </div>
             </div>
     <!-- Toast Notification -->
-    <div class="toast" id="toast">Acknowledgement submitted successfully!</div>
+    <div class="toast" id="toast"></div>
     
     <script>
   // ========== CONFIGURATION ==========
@@ -3638,11 +3638,25 @@
     }
 
     // ========== MODAL FUNCTIONS ==========
-    function closeAllModals() {
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.style.display = 'none';
-        });
-    }
+
+    // Update your closeAllModals function to clear forms
+        function closeAllModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+
+            // Clear registration form when modal closes
+            const registerForm = document.getElementById('registerModal');
+            if (registerForm.style.display === 'none') {
+                document.getElementById('register-name').value = '';
+                document.getElementById('register-email').value = '';
+                document.getElementById('register-position').selectedIndex = 0;
+                document.getElementById('register-code').value = '';
+                document.getElementById('register-password').value = '';
+                document.getElementById('register-confirm-password').value = '';
+                document.getElementById('password-strength').textContent = '';
+            }
+        }
 
     function openRegisterModal() {
         document.getElementById('registerModal').style.display = 'block';
@@ -3915,13 +3929,27 @@
         });
 
         // Logout functionality
+        
         document.getElementById('logout-btn').addEventListener('click', function () {
             currentUser = null;
+
+            // Clear all login/registration forms
+            document.getElementById('direct-email').value = '';
+            document.getElementById('direct-password').value = '';
+            document.getElementById('register-name').value = '';
+            document.getElementById('register-email').value = '';
+            document.getElementById('register-position').selectedIndex = 0;
+            document.getElementById('register-code').value = '';
+            document.getElementById('register-password').value = '';
+            document.getElementById('register-confirm-password').value = '';
+            document.getElementById('password-strength').textContent = '';
+
+            // Reset UI
             document.getElementById('login-barrier').style.display = 'flex';
             document.querySelector('.container').style.display = 'none';
             document.getElementById('login-section').style.display = 'block';
             document.getElementById('user-display').style.display = 'none';
-            document.getElementById('direct-email').value = '';
+
             showToast('Logged out successfully');
         });
 
