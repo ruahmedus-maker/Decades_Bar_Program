@@ -3494,6 +3494,20 @@
                                         "DECADESADMIN",     // Admin/owner level
                                         
                                     ];
+
+                                    // Define showToast function
+                                        function showToast(message) {
+                                            const toast = document.getElementById('toast');
+                                            if (toast) {
+                                                toast.textContent = message;
+                                                toast.classList.add('show');
+                                                setTimeout(() => {
+                                                    toast.classList.remove('show');
+                                                }, 3000);
+                                            }
+                                        }
+
+
                                 function validatePasswordStrength(password) {
                                         const requirements = {
                                             length: password.length >= 6,
