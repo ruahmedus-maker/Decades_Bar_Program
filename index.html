@@ -3872,31 +3872,7 @@
                                             }
                                         });
 
-                                        // Update registration to auto-set position based on code
-                                            document.getElementById('register-code').addEventListener('input', function () {
-                                                const code = this.value.trim();
-                                                const positionSelect = document.getElementById('register-position');
-
-                                                // Clear existing options
-                                                positionSelect.innerHTML = '';
-
-                                                if (APPROVED_CODES[code]) {
-                                                    // Add available positions for this code
-                                                    APPROVED_CODES[code].forEach(position => {
-                                                        const option = document.createElement('option');
-                                                        option.value = position;
-                                                        option.textContent = position;
-                                                        positionSelect.appendChild(option);
-                                                    });
-                                                } else {
-                                                    // Invalid code - show empty
-                                                    const option = document.createElement('option');
-                                                    option.value = '';
-                                                    option.textContent = 'Enter valid code first';
-                                                    positionSelect.appendChild(option);
-                                                }
-                                            });
-
+                                        
                                 // Session validation on page load
                                 document.addEventListener('DOMContentLoaded', function () {
                                     const validSession = validateSession();
