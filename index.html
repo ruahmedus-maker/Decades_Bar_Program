@@ -72,11 +72,6 @@
             border-left: 3px solid transparent;
             transition: all 0.3s ease;
         }
-
-        /* Hide admin panel from non-admins by default */
-        .nav-links li[data-target="admin-panel"] {
-            display: none;
-        }
     
         .nav-links li:hover {
             background-color: rgba(255, 255, 255, 0.1);
@@ -3929,9 +3924,13 @@
         // Show/hide admin menu based on user role
         function setupAdminMenu() {
             const adminNavItem = document.querySelector('[data-target="admin-panel"]');
+            console.log('setupAdminMenu called - currentUser:', currentUser); // Debug line
+
             if (currentUser && isAdmin(currentUser)) {
+                console.log('User is admin, showing menu'); // Debug line
                 if (adminNavItem) adminNavItem.style.display = 'block';
             } else {
+                console.log('User is not admin, hiding menu'); // Debug line
                 if (adminNavItem) adminNavItem.style.display = 'none';
             }
         }
