@@ -3630,6 +3630,10 @@
                                     return user;
                                 }
 
+                                function openRegisterModal() {
+                                        document.getElementById('registerModal').style.display = 'block';
+                                    }
+
                                 // Enhanced registration function
                                 async function performRegistration(userData) {
                                     const { name, email, position, code, password, confirmPassword } = userData;
