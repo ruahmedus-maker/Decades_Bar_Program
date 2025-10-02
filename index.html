@@ -887,6 +887,7 @@
                 <li data-target="policies"><a href="#"><i class="fas fa-file-contract"></i> Policies</a></li>
                 <li data-target="faq"><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
                 <li data-target="resources"><a href="#"><i class="fas fa-book"></i> Additional Resources</a></li>
+                <li data-target="admin-panel"><a href="#"><i class="fas fa-user-cog"></i> Admin Panel</a></li>
             </ul>
         </div>
         
@@ -3209,6 +3210,61 @@
                 </div>
             </div>
 
+            <!-- Admin Panel Section -->
+            <div class="section" id="admin-panel">
+                <div class="section-header">
+                    <h3>Admin Dashboard</h3>
+                    <span class="badge">Managers Only</span>
+                </div>
+            
+                <!-- Quick Stats -->
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>📊 Quick Stats</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="admin-stats">
+                                <p>Loading statistics...</p>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>⚡ Quick Actions</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Block/Unblock User</label>
+                                <input type="email" id="admin-user-email" placeholder="user@decadesbar.com"
+                                    style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                                <button class="btn" onclick="toggleUserBlock()" style="width: 100%;">
+                                    Toggle Block Status
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- User Management -->
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <h4>👥 Employee Management</h4>
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 15px;">
+                            <button class="btn" onclick="refreshAdminData()">
+                                <i class="fas fa-sync-alt"></i> Refresh Data
+                            </button>
+                        </div>
+                        <div id="admin-user-list">
+                            <!-- User list will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
             <!-- FAQ Section -->
             <div class="section" id="faq">
@@ -3391,8 +3447,8 @@
     };
 
     const APPROVED_CODES = [
-        "DECADES2024", "BARSTAFF2024", "MANAGER2024",
-        "DECADESADMIN", "NIGHTCREW2024", "VIPACCESS2024"
+        "BARSTAFF2025", "MANAGER2025", "DECADESADMIN"
+        
     ];
 
     // ========== CORE FUNCTIONS ==========
@@ -3535,7 +3591,7 @@
     let loginAttempts = JSON.parse(localStorage.getItem('loginAttempts')) || {};
 
     function isAdmin(user) {
-        const adminPositions = ['Manager', 'Bar Manager', 'General Manager', 'Owner'];
+        const adminPositions = ['Admin'];
         return adminPositions.includes(user.position);
     }
 
@@ -3584,6 +3640,10 @@
 
         if (!user) {
             throw new Error('Invalid email or password');
+        }
+
+        if (user.status === 'blocked') {
+            throw new Error('Account has been blocked. Please contact management.');
         }
 
         const hashedPassword = hashPassword(password);
@@ -3662,11 +3722,179 @@
         document.getElementById('registerModal').style.display = 'block';
     }
 
+    // ========== ADMIN FUNCTIONS ==========
+        function isAdmin(user) {
+            if (!user) return false;
+            const adminPositions = ['Manager', 'Bar Manager', 'General Manager', 'Owner'];
+            return adminPositions.includes(user.position);
+        }
+
+        function refreshAdminData() {
+            if (!currentUser || !isAdmin(currentUser)) {
+                alert('Admin access required');
+                return;
+            }
+            updateAdminStats();
+            displayAdminUserList();
+        }
+
+        function updateAdminStats() {
+            const users = getUserDatabase();
+            const userArray = Object.values(users);
+
+            const totalUsers = userArray.length;
+            const activeUsers = userArray.filter(u => u.status !== 'blocked').length;
+            const blockedUsers = userArray.filter(u => u.status === 'blocked').length;
+            const completedTraining = userArray.filter(u => u.progress >= 100).length;
+            const acknowledgedCount = userArray.filter(u => u.acknowledged).length;
+
+            const statsHtml = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div><strong>Total Users:</strong> ${totalUsers}</div>
+            <div><strong>Active:</strong> ${activeUsers}</div>
+            <div><strong>Blocked:</strong> ${blockedUsers}</div>
+            <div><strong>Completed Training:</strong> ${completedTraining}</div>
+            <div><strong>Submitted Acknowledgements:</strong> ${acknowledgedCount}</div>
+            <div><strong>Completion Rate:</strong> ${totalUsers ? Math.round((completedTraining / totalUsers) * 100) : 0}%</div>
+        </div>
+    `;
+
+            const statsElement = document.getElementById('admin-stats');
+            if (statsElement) {
+                statsElement.innerHTML = statsHtml;
+            }
+        }
+
+        function displayAdminUserList() {
+            if (!currentUser || !isAdmin(currentUser)) return;
+
+            const users = getUserDatabase();
+            const container = document.getElementById('admin-user-list');
+
+            if (Object.keys(users).length === 0) {
+                container.innerHTML = '<p>No users found.</p>';
+                return;
+            }
+
+            let html = `
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <thead>
+                    <tr style="background: #f8f9fa;">
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Name</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Email</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Position</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Progress</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Status</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+            Object.entries(users).forEach(([email, user]) => {
+                const progressColor = user.progress >= 100 ? 'green' :
+                    user.progress >= 50 ? 'orange' : 'red';
+
+                const status = user.status === 'blocked' ?
+                    '<span style="color: red;">🔒 Blocked</span>' :
+                    '<span style="color: green;">✅ Active</span>';
+
+                const actionButton = user.status === 'blocked' ?
+                    `<button onclick="unblockUser('${email}')" style="background: #38a169; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8rem;">Unblock</button>` :
+                    `<button onclick="blockUser('${email}')" style="background: #e53e3e; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8rem;">Block</button>`;
+
+                html += `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+                <td style="padding: 12px;">${user.name}</td>
+                <td style="padding: 12px;">${email}</td>
+                <td style="padding: 12px;">${user.position}</td>
+                <td style="padding: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 60px; height: 8px; background: #e2e8f0; border-radius: 4px;">
+                            <div style="width: ${user.progress || 0}%; height: 100%; background: ${progressColor}; border-radius: 4px;"></div>
+                        </div>
+                        <span>${user.progress || 0}%</span>
+                    </div>
+                </td>
+                <td style="padding: 12px;">${status}</td>
+                <td style="padding: 12px;">${actionButton}</td>
+            </tr>
+        `;
+            });
+
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+        }
+
+        function blockUser(email) {
+            if (!currentUser || !isAdmin(currentUser)) {
+                alert('Admin access required');
+                return;
+            }
+
+            if (!confirm(`Block ${email}? They will no longer be able to login.`)) return;
+
+            const users = getUserDatabase();
+            if (users[email]) {
+                users[email].status = 'blocked';
+                saveUserDatabase(users);
+                showToast(`User ${email} has been blocked.`);
+                refreshAdminData();
+            }
+        }
+
+        function unblockUser(email) {
+            if (!currentUser || !isAdmin(currentUser)) {
+                alert('Admin access required');
+                return;
+            }
+
+            const users = getUserDatabase();
+            if (users[email]) {
+                users[email].status = 'active';
+                saveUserDatabase(users);
+                showToast(`User ${email} has been unblocked.`);
+                refreshAdminData();
+            }
+        }
+
+        function toggleUserBlock() {
+            const email = document.getElementById('admin-user-email').value.trim();
+            if (!email) {
+                alert('Please enter an email address');
+                return;
+            }
+
+            const users = getUserDatabase();
+            if (!users[email]) {
+                alert('User not found.');
+                return;
+            }
+
+            if (users[email].status === 'blocked') {
+                unblockUser(email);
+            } else {
+                blockUser(email);
+            }
+
+            document.getElementById('admin-user-email').value = '';
+        }
+
     // ========== EVENT LISTENERS ==========
     document.addEventListener('DOMContentLoaded', function () {
         // Navigation
         document.querySelectorAll('.nav-links li').forEach(item => {
             item.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-target');
+
+                // === ADD THIS ADMIN CHECK ===
+                if (targetId === 'admin-panel' && currentUser && !isAdmin(currentUser)) {
+                    alert('Admin access required');
+                    return;
+                }
+                // === END ADMIN CHECK ===
+
                 document.querySelectorAll('.nav-links li').forEach(li => {
                     li.classList.remove('active');
                 });
@@ -3676,9 +3904,14 @@
                     section.classList.remove('active');
                 });
 
-                const targetId = this.getAttribute('data-target');
                 document.getElementById(targetId).classList.add('active');
                 document.getElementById('page-title').textContent = this.querySelector('a').textContent.trim();
+
+                // === ADD THIS: Refresh admin data when admin panel is accessed ===
+                if (targetId === 'admin-panel' && currentUser && isAdmin(currentUser)) {
+                    setTimeout(refreshAdminData, 100);
+                }
+                // === END ADMIN REFRESH ===
 
                 if (!document.getElementById(targetId).classList.contains('visited')) {
                     document.getElementById(targetId).classList.add('visited');
@@ -3686,6 +3919,19 @@
                 }
             });
         });
+
+        // Show/hide admin menu based on user role
+        function setupAdminMenu() {
+            const adminNavItem = document.querySelector('[data-target="admin-panel"]');
+            if (currentUser && isAdmin(currentUser)) {
+                if (adminNavItem) adminNavItem.style.display = 'block';
+            } else {
+                if (adminNavItem) adminNavItem.style.display = 'none';
+            }
+        }
+
+        setupAdminMenu();
+        
 
         // FAQ toggle
         document.querySelectorAll('.faq-question').forEach(question => {
@@ -3737,7 +3983,7 @@
             calculateProgress();
         }
 
-        // ========== LOGIN/RECISTRATION EVENT LISTENERS ==========
+        // ========== LOGIN/REGISTRATION EVENT LISTENERS ==========
 
         // Direct barrier login
         document.getElementById('direct-login').addEventListener('click', async function () {
@@ -3779,6 +4025,7 @@
 
                 showToast(`Welcome back, ${user.name}!`);
                 updateProgressDisplay();
+                setupAdminMenu();
 
             } catch (error) {
                 alert(error.message);
@@ -3830,6 +4077,7 @@
 
                 showToast(`Welcome to Decades Bar, ${user.name}!`);
                 updateProgressDisplay();
+                setupAdminMenu();
 
             } catch (error) {
                 alert(error.message);
@@ -3950,6 +4198,8 @@
             document.getElementById('login-section').style.display = 'block';
             document.getElementById('user-display').style.display = 'none';
 
+            setupAdminMenu();
+
             showToast('Logged out successfully');
         });
 
@@ -3964,6 +4214,8 @@
             document.getElementById('user-display-name').textContent = `${validSession.name} (${validSession.role})`;
             document.getElementById('user-avatar').textContent = validSession.name.charAt(0).toUpperCase();
             updateProgressDisplay();
+
+            setupAdminMenu();
         }
 
         // Auto-logout after session timeout
