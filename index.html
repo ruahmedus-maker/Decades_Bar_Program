@@ -3487,6 +3487,21 @@
                                     passwordMinLength: 6
                                 };
 
+                                // If using position-based codes, use this version:
+                                    const APPROVED_CODES = {
+                                        // Employee codes
+                                        "DECADES2024": ["Bartender", "Senior Bartender", "Barback", "Trainee"],
+                                        "BARSTAFF2024": ["Bartender", "Senior Bartender", "Barback", "Trainee"],
+
+                                        // Manager codes (these create admin users)
+                                        "MANAGER2024": ["Manager", "Bar Manager", "General Manager"],
+                                        "DECADESADMIN": ["Manager", "Bar Manager", "General Manager", "Owner"],
+
+                                        // Special access
+                                        "NIGHTCREW2024": ["Bartender", "Senior Bartender", "Barback", "Security"],
+                                        "VIPACCESS2024": ["All Positions"] // Works for any position
+                                    };
+
                                 function validatePasswordStrength(password) {
                                         const requirements = {
                                             length: password.length >= 6,
@@ -3667,6 +3682,11 @@
                                     
                                     if (!APPROVED_CODES.includes(code)) {
                                         throw new Error('Invalid registration code');
+                                    }
+
+                                    // Additionally, check if the selected position is allowed for this code
+                                    if (!APPROVED_CODES[code].includes(position)) {
+                                        throw new Error('Invalid position for this registration code.');
                                     }
 
                                     const users = getUserDatabase();
@@ -3864,6 +3884,31 @@
                                                 }
                                             }
                                         });
+
+                                        // Update registration to auto-set position based on code
+                                            document.getElementById('register-code').addEventListener('input', function () {
+                                                const code = this.value.trim();
+                                                const positionSelect = document.getElementById('register-position');
+
+                                                // Clear existing options
+                                                positionSelect.innerHTML = '';
+
+                                                if (APPROVED_CODES[code]) {
+                                                    // Add available positions for this code
+                                                    APPROVED_CODES[code].forEach(position => {
+                                                        const option = document.createElement('option');
+                                                        option.value = position;
+                                                        option.textContent = position;
+                                                        positionSelect.appendChild(option);
+                                                    });
+                                                } else {
+                                                    // Invalid code - show empty
+                                                    const option = document.createElement('option');
+                                                    option.value = '';
+                                                    option.textContent = 'Enter valid code first';
+                                                    positionSelect.appendChild(option);
+                                                }
+                                            });
 
                                 // Session validation on page load
                                 document.addEventListener('DOMContentLoaded', function () {
