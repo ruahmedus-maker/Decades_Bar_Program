@@ -3359,9 +3359,8 @@
                             <label for="register-position">Position</label>
                             <select id="register-position">
                                 <option value="Bartender">Bartender</option>
-                                <option value="Senior Bartender">Senior Bartender</option>
+                                <option value="Admin">Admin</option>
                                 <option value="Manager">Manager</option>
-                                <option value="Bar Manager">Bar Manager</option>
                                 <option value="Trainee">Trainee</option>
                             </select>
                         </div>
@@ -3490,17 +3489,14 @@
                                 // If using position-based codes, use this version:
                                     const APPROVED_CODES = {
                                         // Employee codes
-                                        "DECADES2024": ["Bartender", "Senior Bartender", "Barback", "Trainee"],
-                                        "BARSTAFF2024": ["Bartender", "Senior Bartender", "Barback", "Trainee"],
+                                        "DECADES2025": ["Trainee"],
+                                        "BARSTAFF2025": ["Bartender"],
 
                                         // Manager codes (these create admin users)
-                                        "MANAGER2024": ["Manager", "Bar Manager", "General Manager"],
-                                        "DECADESADMIN": ["Manager", "Bar Manager", "General Manager", "Owner"],
+                                        "MANAGER2025": ["Manager"],
+                                        "DECADESADMIN": ["Admin"],
 
-                                        // Special access
-                                        "NIGHTCREW2024": ["Bartender", "Senior Bartender", "Barback", "Security"],
-                                        "VIPACCESS2024": ["All Positions"] // Works for any position
-                                    };
+                                    }
 
                                 function validatePasswordStrength(password) {
                                         const requirements = {
