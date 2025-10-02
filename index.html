@@ -3638,20 +3638,23 @@
                                 async function performRegistration(userData) {
                                     const { name, email, position, code, password, confirmPassword } = userData;
 
-                                    // Validation
+                                     // Validation
                                     if (!name || !email || !position || !code || !password || !confirmPassword) {
                                         throw new Error('Please fill in all fields');
                                     }
 
+                                    // Check if passwords match
                                     if (password !== confirmPassword) {
+                                        console.log('Registration failed - passwords dont match:', password, confirmPassword);
                                         throw new Error('Passwords do not match');
                                     }
 
+                                    // Check password strength
                                     const strengthError = validatePasswordStrength(password);
                                     if (strengthError) {
                                         throw new Error(strengthError);
                                     }
-
+                                    
                                     if (!APPROVED_CODES.includes(code)) {
                                         throw new Error('Invalid registration code');
                                     }
