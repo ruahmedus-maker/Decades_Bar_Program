@@ -4942,14 +4942,18 @@
                 ];
 
                 function initializeTest() {
+                    const testSection = document.getElementById('tests');
+                    const testNavItem = document.getElementById('tests-nav-item');
+
                     if (!ENABLE_TESTS) {
                         // Hide test section if disabled
-                        const testSection = document.getElementById('tests');
-                        const testNavItem = document.querySelector('[data-target="tests"]');
-
                         if (testSection) testSection.style.display = 'none';
                         if (testNavItem) testNavItem.style.display = 'none';
                         return;
+                    } else {
+                        // Show test section if enabled
+                        if (testSection) testSection.style.display = 'block';
+                        if (testNavItem) testNavItem.style.display = 'block';
                     }
 
                     // Generate test questions
@@ -4974,7 +4978,6 @@
                         });
                     }
                 }
-
                 function submitTest(testNumber) {
                     if (testNumber === 1) {
                         let score = 0;
