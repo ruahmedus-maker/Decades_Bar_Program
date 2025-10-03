@@ -828,6 +828,174 @@
     margin: 0 auto;
     padding: 0 1rem;
 }
+
+/* Calendar Styling */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-nav {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+        
+        .calendar-day-header {
+            font-weight: bold;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+        }
+        
+        .calendar-day {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            min-height: 80px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .calendar-day:hover {
+            background: #f8f9fa;
+        }
+        
+        .calendar-day.empty {
+            background: #f8f9fa;
+            cursor: default;
+        }
+        
+        .calendar-day.today {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        
+        .calendar-day.cleaning-day {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .cleaning-indicator {
+            font-size: 0.7rem;
+            background: var(--success);
+            color: white;
+            border-radius: 3px;
+            padding: 2px 5px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        
+        /* Test Section Styling */
+        .test-question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            background: white;
+        }
+        
+        .test-question.correct {
+            border-color: #38a169;
+            background: #f0fff4;
+        }
+        
+        .test-question.incorrect {
+            border-color: #e53e3e;
+            background: #fff5f5;
+        }
+        
+        .test-feedback {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .test-feedback.correct {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .test-feedback.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .test-results {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .test-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .test-pass {
+            color: var(--success);
+        }
+        
+        .test-fail {
+            color: #e53e3e;
+        }
+        
+        /* Admin Test Results Styling */
+        .test-results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .test-results-table th,
+        .test-results-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .test-results-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .test-results-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .test-pass-badge {
+            background: #38a169;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .test-fail-badge {
+            background: #e53e3e;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
@@ -4618,6 +4786,384 @@
                 location.reload();
             }
         }, 60000);
+
+         // ========== CONFIGURATION ==========
+                // Set this to true to enable tests, false to hide them
+                const ENABLE_TESTS = true;
+
+                // ========== BAR CLEANING CALENDAR ==========
+                let currentMonth = new Date().getMonth();
+                let currentYear = new Date().getFullYear();
+                let cleaningDays = JSON.parse(localStorage.getItem('decadesCleaningDays')) || [];
+
+                function generateCalendar(month, year) {
+                    const calendarElement = document.getElementById('cleaning-calendar');
+                    if (!calendarElement) return;
+
+                    // Clear existing content
+                    calendarElement.innerHTML = '';
+
+                    // Create day headers
+                    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    dayHeaders.forEach(day => {
+                        const dayElement = document.createElement('div');
+                        dayElement.className = 'calendar-day-header';
+                        dayElement.textContent = day;
+                        calendarElement.appendChild(dayElement);
+                    });
+
+                    // Get first day of month and number of days
+                    const firstDay = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                    // Add empty days for alignment
+                    for (let i = 0; i < firstDay; i++) {
+                        const emptyDay = document.createElement('div');
+                        emptyDay.className = 'calendar-day empty';
+                        calendarElement.appendChild(emptyDay);
+                    }
+
+                    // Add days of the month
+                    const today = new Date();
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const dayElement = document.createElement('div');
+                        dayElement.className = 'calendar-day';
+
+                        // Check if today
+                        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                            dayElement.classList.add('today');
+                        }
+
+                        // Check if cleaning day
+                        const dateStr = `${year}-${month + 1}-${day}`;
+                        if (cleaningDays.includes(dateStr)) {
+                            dayElement.classList.add('cleaning-day');
+                        }
+
+                        dayElement.innerHTML = `
+                    <div>${day}</div>
+                    ${cleaningDays.includes(dateStr) ? '<div class="cleaning-indicator">Cleaning</div>' : ''}
+                `;
+
+                        // Add click event to toggle cleaning day
+                        dayElement.addEventListener('click', () => toggleCleaningDay(year, month, day));
+
+                        calendarElement.appendChild(dayElement);
+                    }
+
+                    // Update month/year display
+                    const monthYearElement = document.getElementById('calendar-month-year');
+                    if (monthYearElement) {
+                        const monthNames = ["January", "February", "March", "April", "May", "June",
+                            "July", "August", "September", "October", "November", "December"];
+                        monthYearElement.textContent = `${monthNames[month]} ${year}`;
+                    }
+                }
+
+                function toggleCleaningDay(year, month, day) {
+                    const dateStr = `${year}-${month + 1}-${day}`;
+                    const index = cleaningDays.indexOf(dateStr);
+
+                    if (index > -1) {
+                        // Remove if already exists
+                        cleaningDays.splice(index, 1);
+                    } else {
+                        // Add if not exists
+                        cleaningDays.push(dateStr);
+                    }
+
+                    // Save to localStorage
+                    localStorage.setItem('decadesCleaningDays', JSON.stringify(cleaningDays));
+
+                    // Regenerate calendar
+                    generateCalendar(currentMonth, currentYear);
+                }
+
+                function changeMonth(direction) {
+                    currentMonth += direction;
+
+                    if (currentMonth > 11) {
+                        currentMonth = 0;
+                        currentYear++;
+                    } else if (currentMonth < 0) {
+                        currentMonth = 11;
+                        currentYear--;
+                    }
+
+                    generateCalendar(currentMonth, currentYear);
+                }
+
+                // ========== TEST SYSTEM ==========
+                const testQuestions = [
+                    {
+                        id: 1,
+                        question: "What is the standard pour for a shot of liquor?",
+                        options: [
+                            { text: "1 oz", correct: false },
+                            { text: "1.5 oz", correct: true },
+                            { text: "2 oz", correct: false },
+                            { text: "2.5 oz", correct: false }
+                        ],
+                        feedback: "The standard pour for a shot is 1.5 oz."
+                    },
+                    {
+                        id: 2,
+                        question: "Which glass should be used for a Manhattan cocktail?",
+                        options: [
+                            { text: "Highball glass", correct: false },
+                            { text: "Martini glass", correct: true },
+                            { text: "Rocks glass", correct: false },
+                            { text: "Shot glass", correct: false }
+                        ],
+                        feedback: "A Manhattan is typically served in a Martini glass."
+                    },
+                    {
+                        id: 3,
+                        question: "What is the correct procedure for checking ID?",
+                        options: [
+                            { text: "Check only if they look under 30", correct: false },
+                            { text: "Check every customer who appears under 40", correct: true },
+                            { text: "Check only on weekends", correct: false },
+                            { text: "Never check regular customers", correct: false }
+                        ],
+                        feedback: "Always check ID for customers who appear under 40."
+                    },
+                    {
+                        id: 4,
+                        question: "Which of these is NOT a sign of intoxication?",
+                        options: [
+                            { text: "Slurred speech", correct: false },
+                            { text: "Buying drinks for others", correct: true },
+                            { text: "Spilling drinks", correct: false },
+                            { text: "Being overly friendly", correct: false }
+                        ],
+                        feedback: "Buying drinks for others is not necessarily a sign of intoxication."
+                    }
+                ];
+
+                function initializeTest() {
+                    if (!ENABLE_TESTS) {
+                        // Hide test section if disabled
+                        const testSection = document.getElementById('tests');
+                        const testNavItem = document.querySelector('[data-target="tests"]');
+
+                        if (testSection) testSection.style.display = 'none';
+                        if (testNavItem) testNavItem.style.display = 'none';
+                        return;
+                    }
+
+                    // Generate test questions
+                    const test1Questions = document.getElementById('test1-questions');
+                    if (test1Questions) {
+                        test1Questions.innerHTML = '';
+
+                        testQuestions.forEach((q, index) => {
+                            const questionElement = document.createElement('div');
+                            questionElement.className = 'test-question';
+                            questionElement.innerHTML = `
+                        <p><strong>${index + 1}. ${q.question}</strong></p>
+                        ${q.options.map((opt, i) => `
+                            <label>
+                                <input type="radio" name="q${q.id}" value="${i}">
+                                ${opt.text}
+                            </label><br>
+                        `).join('')}
+                        <div class="test-feedback" id="feedback-${q.id}" style="display: none;"></div>
+                    `;
+                            test1Questions.appendChild(questionElement);
+                        });
+                    }
+                }
+
+                function submitTest(testNumber) {
+                    if (testNumber === 1) {
+                        let score = 0;
+                        const totalQuestions = testQuestions.length;
+
+                        testQuestions.forEach(q => {
+                            const selectedOption = document.querySelector(`input[name="q${q.id}"]:checked`);
+                            const questionElement = document.querySelector(`#test1-questions .test-question:nth-child(${q.id})`);
+                            const feedbackElement = document.getElementById(`feedback-${q.id}`);
+
+                            if (!selectedOption) {
+                                // No answer selected
+                                questionElement.classList.remove('correct', 'incorrect');
+                                feedbackElement.textContent = "Please select an answer.";
+                                feedbackElement.className = 'test-feedback';
+                                feedbackElement.style.display = 'block';
+                                return;
+                            }
+
+                            const selectedIndex = parseInt(selectedOption.value);
+                            const isCorrect = q.options[selectedIndex].correct;
+
+                            if (isCorrect) {
+                                score++;
+                                questionElement.classList.add('correct');
+                                questionElement.classList.remove('incorrect');
+                                feedbackElement.textContent = "Correct! " + q.feedback;
+                                feedbackElement.className = 'test-feedback correct';
+                            } else {
+                                questionElement.classList.add('incorrect');
+                                questionElement.classList.remove('correct');
+                                feedbackElement.textContent = "Incorrect. " + q.feedback;
+                                feedbackElement.className = 'test-feedback incorrect';
+                            }
+
+                            feedbackElement.style.display = 'block';
+                        });
+
+                        // Display results
+                        const percentage = Math.round((score / totalQuestions) * 100);
+                        const resultsElement = document.getElementById('test-results');
+
+                        if (resultsElement) {
+                            resultsElement.innerHTML = `
+                        <div class="test-score ${percentage >= 70 ? 'test-pass' : 'test-fail'}">
+                            Score: ${score}/${totalQuestions} (${percentage}%)
+                        </div>
+                        <p>${percentage >= 70 ?
+                                    'Congratulations! You passed the test.' :
+                                    'Please review the materials and try again.'}
+                        </p>
+                        <p><strong>Your test results have been recorded and are visible to management.</strong></p>
+                        <button class="btn" onclick="resetTest(1)" style="margin-top: 10px;">
+                            Retake Test
+                        </button>
+                    `;
+                        }
+
+                        // Save test results to user database
+                        if (currentUser) {
+                            const users = getUserDatabase();
+                            const user = users[currentUser.email];
+
+                            if (user) {
+                                if (!user.testResults) user.testResults = {};
+                                user.testResults[`test${testNumber}`] = {
+                                    score: score,
+                                    total: totalQuestions,
+                                    percentage: percentage,
+                                    passed: percentage >= 70,
+                                    date: new Date().toISOString(),
+                                    testName: "Bartending Fundamentals"
+                                };
+
+                                saveUserDatabase(users);
+                                showToast('Test results saved successfully!');
+                            }
+                        }
+                    }
+                }
+
+                function resetTest(testNumber) {
+                    if (testNumber === 1) {
+                        // Clear all selections
+                        document.querySelectorAll('#test1-questions input[type="radio"]').forEach(input => {
+                            input.checked = false;
+                        });
+
+                        // Reset question styling
+                        document.querySelectorAll('#test1-questions .test-question').forEach(q => {
+                            q.classList.remove('correct', 'incorrect');
+                        });
+
+                        // Hide feedback
+                        document.querySelectorAll('.test-feedback').forEach(feedback => {
+                            feedback.style.display = 'none';
+                        });
+
+                        // Clear results
+                        const resultsElement = document.getElementById('test-results');
+                        if (resultsElement) {
+                            resultsElement.innerHTML = '<p>No tests submitted yet.</p>';
+                        }
+                    }
+                }
+
+                // ========== ADMIN TEST RESULTS ==========
+                function displayAdminTestResults() {
+                    if (!currentUser || !isAdmin(currentUser)) return;
+
+                    const container = document.getElementById('admin-test-results');
+                    if (!container) return;
+
+                    const users = getUserDatabase();
+                    let html = '<h4 style="margin-bottom: 15px;">Employee Test Results</h4>';
+
+                    // Check if any users have test results
+                    const usersWithResults = Object.entries(users).filter(([email, user]) =>
+                        user.testResults && Object.keys(user.testResults).length > 0
+                    );
+
+                    if (usersWithResults.length === 0) {
+                        html += '<p>No test results available.</p>';
+                        container.innerHTML = html;
+                        return;
+                    }
+
+                    html += `
+                <table class="test-results-table">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Position</th>
+                            <th>Test</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+                    usersWithResults.forEach(([email, user]) => {
+                        Object.entries(user.testResults).forEach(([testId, result]) => {
+                            const date = new Date(result.date);
+                            const formattedDate = date.toLocaleDateString();
+
+                            html += `
+                        <tr>
+                            <td>${user.name}</td>
+                            <td>${user.position}</td>
+                            <td>${result.testName || testId}</td>
+                            <td>${result.score}/${result.total} (${result.percentage}%)</td>
+                            <td>
+                                <span class="${result.passed ? 'test-pass-badge' : 'test-fail-badge'}">
+                                    ${result.passed ? 'Passed' : 'Failed'}
+                                </span>
+                            </td>
+                            <td>${formattedDate}</td>
+                        </tr>
+                    `;
+                        });
+                    });
+
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                }
+
+                // ========== INITIALIZATION ==========
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Initialize calendar
+                    generateCalendar(currentMonth, currentYear);
+
+                    // Initialize tests
+                    initializeTest();
+
+                    // Add event listeners for calendar navigation
+                    document.getElementById('prev-month')?.addEventListener('click', () => changeMonth(-1));
+                    document.getElementById('next-month')?.addEventListener('click', () => changeMonth(1));
+
+                    // Add test results to admin panel when it's accessed
+                    document.querySelector('[data-target="admin-panel"]')?.addEventListener('click', function () {
+                        setTimeout(() => {
+                            if (currentUser && isAdmin(currentUser)) {
+                                displayAdminTestResults();
+                            }
+                        }, 100);
+                    });
+                });
 
 
     });
