@@ -996,13 +996,28 @@
             border-radius: 12px;
             font-size: 0.8rem;
         }
-
+        
+        /* Add this style for the test results container in admin panel */
         #admin-test-results {
             margin-top: 20px;
         }
-
-        .tests-disabled {
+        
+        /* NEW: More specific CSS for test visibility */
+        #tests.tests-disabled {
             display: none !important;
+        }
+        
+        #tests-nav-item.tests-disabled {
+            display: none !important;
+        }
+        
+        /* Ensure tests are visible when enabled */
+        #tests:not(.tests-disabled) {
+            display: block;
+        }
+        
+        #tests-nav-item:not(.tests-disabled) {
+            display: list-item;
         }
     </style>
 </head>
@@ -3659,6 +3674,16 @@
                     <h3>Admin Dashboard</h3>
                     <span class="badge">Managers Only</span>
                 </div>
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <h4>📊 Employee Test Results</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="admin-test-results">
+                            <p>No test results available.</p>
+                        </div>
+                    </div>
+                </div>
             
                 <!-- Quick Stats -->
                 <div class="card-grid">
@@ -4795,9 +4820,9 @@
             }
         }, 60000);
 
-         // ========== CONFIGURATION ==========
+          // ========== CONFIGURATION ==========
                 // Set this to true to enable tests, false to hide them
-                const ENABLE_TESTS = true;
+                const ENABLE_TESTS = true; // Set to true to show tests
 
                 // ========== BAR CLEANING CALENDAR ==========
                 let currentMonth = new Date().getMonth();
@@ -4953,15 +4978,33 @@
                     const testSection = document.getElementById('tests');
                     const testNavItem = document.getElementById('tests-nav-item');
 
+                    console.log("Initializing tests. ENABLE_TESTS:", ENABLE_TESTS);
+                    console.log("Test section:", testSection);
+                    console.log("Test nav item:", testNavItem);
+
                     if (!ENABLE_TESTS) {
                         // Hide test section and nav item if disabled
-                        if (testSection) testSection.classList.add('tests-disabled');
-                        if (testNavItem) testNavItem.classList.add('tests-disabled');
+                        console.log("Tests are disabled - hiding elements");
+                        if (testSection) {
+                            testSection.classList.add('tests-disabled');
+                            testSection.style.display = 'none';
+                        }
+                        if (testNavItem) {
+                            testNavItem.classList.add('tests-disabled');
+                            testNavItem.style.display = 'none';
+                        }
                         return;
                     } else {
                         // Show test section and nav item if enabled
-                        if (testSection) testSection.classList.remove('tests-disabled');
-                        if (testNavItem) testNavItem.classList.remove('tests-disabled');
+                        console.log("Tests are enabled - showing elements");
+                        if (testSection) {
+                            testSection.classList.remove('tests-disabled');
+                            testSection.style.display = 'block';
+                        }
+                        if (testNavItem) {
+                            testNavItem.classList.remove('tests-disabled');
+                            testNavItem.style.display = 'list-item';
+                        }
 
                         // Generate test questions
                         const test1Questions = document.getElementById('test1-questions');
@@ -4986,6 +5029,7 @@
                         }
                     }
                 }
+
                 function submitTest(testNumber) {
                     if (testNumber === 1) {
                         let score = 0;
@@ -5159,7 +5203,7 @@
                     // Initialize calendar
                     generateCalendar(currentMonth, currentYear);
 
-                    // Initialize tests
+                    // Initialize tests - this will show/hide based on ENABLE_TESTS
                     initializeTest();
 
                     // Add event listeners for calendar navigation
@@ -5175,7 +5219,6 @@
                         }, 100);
                     });
                 });
-
 
     });
     </script>
