@@ -874,6 +874,8 @@
             <ul class="nav-links">
                 <li class="active" data-target="welcome"><a href="#"><i class="fas fa-home"></i> Welcome</a></li>
                 <li data-target="training"><a href="#"><i class="fas fa-graduation-cap"></i> Training Materials</a></li>
+                <li data-target="tests" style="display: none;"><a href="#"><i class="fas fa-question-circle"></i> Training Tests</a>
+                </li>
                 <li data-target="procedures"><a href="#"><i class="fas fa-clipboard-list"></i> Standard Procedures</a></li>
                 <li data-target="aloha-pos"><a href="#"><i class="fas fa-cash-register"></i> Aloha POS</a></li>
                 <li data-target="videos"><a href="#"><i class="fas fa-play-circle"></i> Video Library</a></li>
@@ -881,6 +883,7 @@
                 <li data-target="drink-specials"><a href="#"><i class="fas fa-tags"></i> Drink Specials</a></li>
                 <li data-target="glassware-guide"><a href="#"><i class="fas fa-wine-glass"></i> Glassware Guide</a></li>
                 <li data-target="uniform-guide"><a href="#"><i class="fas fa-tshirt"></i> Uniform Guide</a></li>
+                <li data-target="bar-cleanings"><a href="#"><i class="fas fa-broom"></i> Bar Cleanings</a></li>
                 <li data-target="social-media"><a href="#"><i class="fas fa-hashtag"></i> Social Media</a></li>
                 <li data-target="special-events"><a href="#"><i class="fas fa-calendar-alt"></i> Special Events</a></li>
                 <li data-target="comps-voids"><a href="#"><i class="fas fa-hand-holding-usd"></i> Comps & Voids</a></li>
@@ -1009,6 +1012,152 @@
                                 <li>Handling difficult situations</li>
                                 <li>Upselling techniques</li>
                             </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tests Section -->
+            <div class="section" id="tests">
+                <div class="section-header">
+                    <h3>Training Tests & Assessments</h3>
+                    <span class="badge">Evaluation</span>
+                </div>
+            
+                <!-- Test 1: Bartending Basics -->
+                <div class="card" style="margin-bottom: 25px;">
+                    <div class="card-header">
+                        <h4>🧪 Test 1: Bartending Fundamentals</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="test1-questions">
+                            <!-- Question 1 -->
+                            <div class="test-question"
+                                style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
+                                <p><strong>1. What is the standard pour for a shot of liquor?</strong></p>
+                                <label><input type="radio" name="q1" value="a"> 1 oz</label><br>
+                                <label><input type="radio" name="q1" value="b"> 1.5 oz</label><br>
+                                <label><input type="radio" name="q1" value="c"> 2 oz</label><br>
+                                <label><input type="radio" name="q1" value="d"> 2.5 oz</label>
+                            </div>
+            
+                            <!-- Question 2 -->
+                            <div class="test-question"
+                                style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
+                                <p><strong>2. Which glass should be used for a Manhattan cocktail?</strong></p>
+                                <label><input type="radio" name="q2" value="a"> Highball glass</label><br>
+                                <label><input type="radio" name="q2" value="b"> Martini glass</label><br>
+                                <label><input type="radio" name="q2" value="c"> Rocks glass</label><br>
+                                <label><input type="radio" name="q2" value="d"> Shot glass</label>
+                            </div>
+            
+                            <!-- Question 3 -->
+                            <div class="test-question"
+                                style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
+                                <p><strong>3. What is the correct procedure for checking ID?</strong></p>
+                                <label><input type="radio" name="q3" value="a"> Check only if they look under 30</label><br>
+                                <label><input type="radio" name="q3" value="b"> Check every customer who appears under
+                                    40</label><br>
+                                <label><input type="radio" name="q3" value="c"> Check only on weekends</label><br>
+                                <label><input type="radio" name="q3" value="d"> Never check regular customers</label>
+                            </div>
+            
+                            <!-- Question 4 -->
+                            <div class="test-question" style="margin-bottom: 20px;">
+                                <p><strong>4. Which of these is NOT a sign of intoxication?</strong></p>
+                                <label><input type="radio" name="q4" value="a"> Slurred speech</label><br>
+                                <label><input type="radio" name="q4" value="b"> Buying drinks for others</label><br>
+                                <label><input type="radio" name="q4" value="c"> Spilling drinks</label><br>
+                                <label><input type="radio" name="q4" value="d"> Being overly friendly</label>
+                            </div>
+                        </div>
+            
+                        <button class="btn" onclick="submitTest(1)" style="margin-top: 15px;">
+                            Submit Test 1
+                        </button>
+                    </div>
+                </div>
+            
+                <!-- Test 2: Cocktail Knowledge -->
+                <div class="card" style="margin-bottom: 25px;">
+                    <div class="card-header">
+                        <h4>🍸 Test 2: Cocktail Recipes</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="test2-questions">
+                            <!-- Question 1 -->
+                            <div class="test-question"
+                                style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
+                                <p><strong>1. What are the main ingredients in a Long Island Iced Tea?</strong></p>
+                                <label><input type="checkbox" name="q1" value="a"> Vodka</label><br>
+                                <label><input type="checkbox" name="q1" value="b"> Gin</label><br>
+                                <label><input type="checkbox" name="q1" value="c"> Rum</label><br>
+                                <label><input type="checkbox" name="q1" value="d"> Tequila</label><br>
+                                <label><input type="checkbox" name="q1" value="e"> Triple Sec</label><br>
+                                <label><input type="checkbox" name="q1" value="f"> Sour Mix</label><br>
+                                <label><input type="checkbox" name="q1" value="g"> Cola</label>
+                            </div>
+            
+                            <!-- Question 2 -->
+                            <div class="test-question" style="margin-bottom: 20px;">
+                                <p><strong>2. Match the cocktails with their primary spirits:</strong></p>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <p><strong>Cocktails:</strong></p>
+                                        <div>Old Fashioned</div>
+                                        <div>Margarita</div>
+                                        <div>Mojito</div>
+                                        <div>Martini</div>
+                                    </div>
+                                    <div>
+                                        <p><strong>Spirits:</strong></p>
+                                        <select name="q2_oldfashioned" style="width: 100%; margin-bottom: 5px;">
+                                            <option value="">Select spirit</option>
+                                            <option value="whiskey">Whiskey</option>
+                                            <option value="tequila">Tequila</option>
+                                            <option value="rum">Rum</option>
+                                            <option value="gin">Gin</option>
+                                        </select>
+                                        <select name="q2_margarita" style="width: 100%; margin-bottom: 5px;">
+                                            <option value="">Select spirit</option>
+                                            <option value="whiskey">Whiskey</option>
+                                            <option value="tequila">Tequila</option>
+                                            <option value="rum">Rum</option>
+                                            <option value="gin">Gin</option>
+                                        </select>
+                                        <select name="q2_mojito" style="width: 100%; margin-bottom: 5px;">
+                                            <option value="">Select spirit</option>
+                                            <option value="whiskey">Whiskey</option>
+                                            <option value="tequila">Tequila</option>
+                                            <option value="rum">Rum</option>
+                                            <option value="gin">Gin</option>
+                                        </select>
+                                        <select name="q2_martini" style="width: 100%; margin-bottom: 5px;">
+                                            <option value="">Select spirit</option>
+                                            <option value="whiskey">Whiskey</option>
+                                            <option value="tequila">Tequila</option>
+                                            <option value="rum">Rum</option>
+                                            <option value="gin">Gin</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <button class="btn" onclick="submitTest(2)" style="margin-top: 15px;">
+                            Submit Test 2
+                        </button>
+                    </div>
+                </div>
+            
+                <!-- Test Results -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>📊 Test Results</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="test-results">
+                            <p>No tests submitted yet.</p>
                         </div>
                     </div>
                 </div>
@@ -2607,6 +2756,123 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Bar Cleanings Section -->
+            <div class="section" id="bar-cleanings">
+                <div class="section-header">
+                    <h3>Bar Cleaning Schedule</h3>
+                    <span class="badge">Maintenance</span>
+                </div>
+            
+                <!-- Monthly Calendar -->
+                <div class="card" style="margin-bottom: 25px;">
+                    <div class="card-header">
+                        <h4>📅 Cleaning Schedule - October 2024</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="cleaning-calendar"
+                            style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center;">
+                            <!-- Calendar headers -->
+                            <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Sun</div>
+                            <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Mon</div>
+                            <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Tue</div>
+                            <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Wed</div>
+                            <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Thu</div>
+                            <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Fri</div>
+                            <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Sat</div>
+            
+                            <!-- Calendar days will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Cleaning Procedures -->
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Daily Cleaning</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul>
+                                <li>Wipe down all counter surfaces</li>
+                                <li>Clean and sanitize sinks</li>
+                                <li>Stock ice wells</li>
+                                <li>Clean glass washer</li>
+                                <li>Empty trash and recycling</li>
+                                <li>Mop bar floor</li>
+                            </ul>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Weekly Deep Clean</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul>
+                                <li>Clean beer taps and lines</li>
+                                <li>Deep clean refrigeration units</li>
+                                <li>Sanitize bottle storage areas</li>
+                                <li>Clean under bar equipment</li>
+                                <li>Polish all glassware</li>
+                                <li>Inventory cleaning supplies</li>
+                            </ul>
+                        </div>
+                    </div>
+            
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Monthly Maintenance</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul>
+                                <li>Inspect and clean ventilation</li>
+                                <li>Check emergency equipment</li>
+                                <li>Deep clean storage areas</li>
+                                <li>Equipment maintenance check</li>
+                                <li>Lighting fixture cleaning</li>
+                                <li>Floor deep cleaning</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Cleaning Checklist -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>✅ Cleaning Checklist</h4>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div>
+                                <h5 style="color: var(--primary); margin-bottom: 10px;">Opening Shift</h5>
+                                <div id="opening-checklist">
+                                    <label><input type="checkbox"> Wipe down bar top</label><br>
+                                    <label><input type="checkbox"> Sanitize cutting boards</label><br>
+                                    <label><input type="checkbox"> Check ice supply</label><br>
+                                    <label><input type="checkbox"> Stock napkins/straws</label><br>
+                                    <label><input type="checkbox"> Test POS system</label>
+                                </div>
+                            </div>
+            
+                            <div>
+                                <h5 style="color: var(--primary); margin-bottom: 10px;">Closing Shift</h5>
+                                <div id="closing-checklist">
+                                    <label><input type="checkbox"> Clean all equipment</label><br>
+                                    <label><input type="checkbox"> Empty and sanitize sinks</label><br>
+                                    <label><input type="checkbox"> Take out trash</label><br>
+                                    <label><input type="checkbox"> Mop floor</label><br>
+                                    <label><input type="checkbox"> Secure liquor storage</label>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <button class="btn" onclick="resetChecklists()" style="margin-top: 15px;">
+                            Reset Checklists
+                        </button>
+                    </div>
+                </div>
+            </div>
             
             <!-- Social Media Promotions Section -->
             <div class="section" id="social-media">
@@ -3946,8 +4212,8 @@
             document.getElementById('admin-user-email').value = '';
         }
 
-    // ========== EVENT LISTENERS ==========
-    document.addEventListener('DOMContentLoaded', function () {
+            // ========== EVENT LISTENERS ==========
+            document.addEventListener('DOMContentLoaded', function () {
         // Navigation
         document.querySelectorAll('.nav-links li').forEach(item => {
             item.addEventListener('click', function () {
@@ -3983,6 +4249,15 @@
                     calculateProgress();
                 }
             });
+
+            // Generate cleaning calendar
+            generateCleaningCalendar();
+
+            // Setup tests visibility
+            setupTests();
+
+            // Display existing test results
+            displayTestResults();
         });
 
         // Show/hide admin menu based on user role
@@ -4351,6 +4626,215 @@
                 location.reload();
             }
         }, 60000);
+
+        // ========== BAR CLEANING FUNCTIONS ==========
+                function generateCleaningCalendar() {
+                    const calendar = document.getElementById('cleaning-calendar');
+                    if (!calendar) return;
+
+                    // Get current date
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = now.getMonth();
+
+                    // Get first day of month and number of days
+                    const firstDay = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                    // Clear calendar
+                    calendar.innerHTML = `
+        <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Sun</div>
+        <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Mon</div>
+        <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Tue</div>
+        <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Wed</div>
+        <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Thu</div>
+        <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Fri</div>
+        <div style="font-weight: bold; padding: 10px; background: var(--primary); color: white;">Sat</div>
+    `;
+
+                    // Add empty cells for days before first day of month
+                    for (let i = 0; i < firstDay; i++) {
+                        const emptyCell = document.createElement('div');
+                        emptyCell.style.padding = '10px';
+                        emptyCell.style.background = '#f8f9fa';
+                        calendar.appendChild(emptyCell);
+                    }
+
+                    // Add days of month
+                    const cleaningDays = [5, 12, 19, 26]; // Saturdays for deep cleaning
+                    const today = now.getDate();
+
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const dayCell = document.createElement('div');
+                        dayCell.style.padding = '10px';
+                        dayCell.style.border = '1px solid #e2e8f0';
+                        dayCell.style.cursor = 'pointer';
+                        dayCell.textContent = day;
+
+                        // Highlight today
+                        if (day === today) {
+                            dayCell.style.background = 'var(--accent)';
+                            dayCell.style.color = 'white';
+                            dayCell.style.fontWeight = 'bold';
+                        }
+
+                        // Highlight cleaning days (Saturdays)
+                        const cellDate = new Date(year, month, day);
+                        if (cellDate.getDay() === 6) { // Saturday
+                            dayCell.style.background = '#fff3cd';
+                            dayCell.style.border = '2px solid #ffc107';
+                            dayCell.title = 'Weekly Deep Cleaning';
+                        }
+
+                        // Add click event to mark/unmark cleaning
+                        dayCell.addEventListener('click', function () {
+                            toggleCleaningDay(day, month, year, this);
+                        });
+
+                        calendar.appendChild(dayCell);
+                    }
+                }
+
+                function toggleCleaningDay(day, month, year, element) {
+                    const cleaningSchedule = JSON.parse(localStorage.getItem('cleaningSchedule')) || {};
+                    const dateKey = `${year}-${month}-${day}`;
+
+                    if (cleaningSchedule[dateKey]) {
+                        // Remove cleaning mark
+                        delete cleaningSchedule[dateKey];
+                        element.style.background = '';
+                        element.style.border = '1px solid #e2e8f0';
+                        element.style.color = '';
+                        showToast('Cleaning removed for ' + (month + 1) + '/' + day);
+                    } else {
+                        // Add cleaning mark
+                        cleaningSchedule[dateKey] = true;
+                        element.style.background = '#d4edda';
+                        element.style.border = '2px solid #28a745';
+                        element.style.color = '#155724';
+                        showToast('Cleaning scheduled for ' + (month + 1) + '/' + day);
+                    }
+
+                    localStorage.setItem('cleaningSchedule', JSON.stringify(cleaningSchedule));
+                }
+
+                function resetChecklists() {
+                    const checkboxes = document.querySelectorAll('#opening-checklist input, #closing-checklist input');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    showToast('Checklists reset');
+                }
+
+                // ========== TESTING SYSTEM FUNCTIONS ==========
+                const TESTS_ENABLED = false; // Change to true to show tests
+
+                function setupTests() {
+                    const testsNavItem = document.querySelector('[data-target="tests"]');
+                    const testsSection = document.getElementById('tests');
+
+                    if (TESTS_ENABLED) {
+                        if (testsNavItem) testsNavItem.style.display = 'block';
+                        if (testsSection) testsSection.style.display = 'block';
+                    } else {
+                        if (testsNavItem) testsNavItem.style.display = 'none';
+                        if (testsSection) testsSection.style.display = 'none';
+                    }
+                }
+
+                function submitTest(testNumber) {
+                    let score = 0;
+                    let totalQuestions = 0;
+
+                    if (testNumber === 1) {
+                        // Test 1 scoring
+                        const answers = {
+                            'q1': 'b', // 1.5 oz
+                            'q2': 'c', // Rocks glass
+                            'q3': 'b', // Check under 40
+                            'q4': 'd'  // Being overly friendly
+                        };
+
+                        totalQuestions = Object.keys(answers).length;
+
+                        for (const [question, correctAnswer] of Object.entries(answers)) {
+                            const selected = document.querySelector(`input[name="${question}"]:checked`);
+                            if (selected && selected.value === correctAnswer) {
+                                score++;
+                            }
+                        }
+                    } else if (testNumber === 2) {
+                        // Test 2 scoring
+                        // Question 1 - check all correct boxes
+                        const q1Correct = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+                        const q1Selected = Array.from(document.querySelectorAll('input[name="q1"]:checked')).map(cb => cb.value);
+                        const q1CorrectCount = q1Selected.filter(val => q1Correct.includes(val)).length;
+                        score += (q1CorrectCount / q1Correct.length) * 2; // Weight this question
+
+                        // Question 2 - matching
+                        const q2Answers = {
+                            'q2_oldfashioned': 'whiskey',
+                            'q2_margarita': 'tequila',
+                            'q2_mojito': 'rum',
+                            'q2_martini': 'gin'
+                        };
+
+                        for (const [selectName, correctValue] of Object.entries(q2Answers)) {
+                            const selected = document.querySelector(`select[name="${selectName}"]`);
+                            if (selected && selected.value === correctValue) {
+                                score++;
+                            }
+                        }
+
+                        totalQuestions = 3; // Q1 counts as 2 points, Q2 has 4 parts but counts as 1 question
+                    }
+
+                    const percentage = Math.round((score / totalQuestions) * 100);
+
+                    // Save test results
+                    const testResults = JSON.parse(localStorage.getItem('testResults')) || {};
+                    testResults[`test${testNumber}`] = {
+                        score: score,
+                        total: totalQuestions,
+                        percentage: percentage,
+                        date: new Date().toISOString()
+                    };
+                    localStorage.setItem('testResults', JSON.stringify(testResults));
+
+                    // Display results
+                    displayTestResults();
+
+                    showToast(`Test ${testNumber} submitted! Score: ${percentage}%`);
+                }
+
+                function displayTestResults() {
+                    const resultsContainer = document.getElementById('test-results');
+                    const testResults = JSON.parse(localStorage.getItem('testResults')) || {};
+
+                    if (Object.keys(testResults).length === 0) {
+                        resultsContainer.innerHTML = '<p>No tests submitted yet.</p>';
+                        return;
+                    }
+
+                    let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">';
+
+                    for (const [testName, result] of Object.entries(testResults)) {
+                        const testNumber = testName.replace('test', '');
+                        const color = result.percentage >= 80 ? 'green' : result.percentage >= 60 ? 'orange' : 'red';
+
+                        html += `
+            <div style="border: 1px solid #e2e8f0; padding: 15px; border-radius: 5px;">
+                <h5 style="margin: 0 0 10px 0;">Test ${testNumber}</h5>
+                <div style="font-size: 1.5rem; color: ${color}; font-weight: bold;">${result.percentage}%</div>
+                <div style="font-size: 0.9rem; color: #666;">${result.score}/${result.total} correct</div>
+                <div style="font-size: 0.8rem; color: #999;">${new Date(result.date).toLocaleDateString()}</div>
+            </div>
+        `;
+                    }
+
+                    html += '</div>';
+                    resultsContainer.innerHTML = html;
+                }
     });
     </script>
 </body>
