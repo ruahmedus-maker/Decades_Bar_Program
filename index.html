@@ -3945,177 +3945,180 @@
     <div class="toast" id="toast"></div>
     
     <script>
-  // ========== CONFIGURATION ==========
-    const SECURITY_CONFIG = {
-        maxLoginAttempts: 5,
-        lockoutTime: 15 * 60 * 1000, // 15 minutes
-        sessionTimeout: 8 * 60 * 60 * 1000, // 8 hours
-        passwordMinLength: 6
-    };
+        // ========== CONFIGURATION ==========
+        const SECURITY_CONFIG = {
+            maxLoginAttempts: 5,
+            lockoutTime: 15 * 60 * 1000, // 15 minutes
+            sessionTimeout: 8 * 60 * 60 * 1000, // 8 hours
+            passwordMinLength: 6
+        };
 
-    const APPROVED_CODES = [
-        "BARSTAFF2025", "MANAGER2025", "DECADESADMIN"
-        
-    ];
+        const APPROVED_CODES = [
+            "BARSTAFF2025", "MANAGER2025", "DECADESADMIN"
+        ];
 
-    // ========== CORE FUNCTIONS ==========
-    function showToast(message) {
-        const toast = document.getElementById('toast');
-        if (toast) {
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+        // Set this to true to enable tests, false to hide them
+        const ENABLE_TESTS = true;
+
+        // ========== CORE FUNCTIONS ==========
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
         }
-    }
 
-    function updateProgressDisplay() {
-        if (currentUser) {
-            const progressFill = document.getElementById('progress-fill');
-            const progressText = document.getElementById('progress-text');
-            const acknowledgementCheckbox = document.getElementById('acknowledgement');
-            const submitBtn = document.getElementById('submit-btn');
+        function updateProgressDisplay() {
+            if (currentUser) {
+                const progressFill = document.getElementById('progress-fill');
+                const progressText = document.getElementById('progress-text');
+                const acknowledgementCheckbox = document.getElementById('acknowledgement');
+                const submitBtn = document.getElementById('submit-btn');
 
-            const users = getUserDatabase();
-            const user = users[currentUser.email];
+                const users = getUserDatabase();
+                const user = users[currentUser.email];
 
-            if (user) {
-                currentUser.progress = user.progress || 0;
-                currentUser.acknowledged = user.acknowledged || false;
+                if (user) {
+                    currentUser.progress = user.progress || 0;
+                    currentUser.acknowledged = user.acknowledged || false;
 
-                if (progressFill) progressFill.style.width = `${currentUser.progress}%`;
-                if (progressText) progressText.textContent = `${currentUser.progress}% Complete`;
+                    if (progressFill) progressFill.style.width = `${currentUser.progress}%`;
+                    if (progressText) progressText.textContent = `${currentUser.progress}% Complete`;
 
-                if (acknowledgementCheckbox) {
-                    acknowledgementCheckbox.checked = currentUser.acknowledged;
-                }
+                    if (acknowledgementCheckbox) {
+                        acknowledgementCheckbox.checked = currentUser.acknowledged;
+                    }
 
-                if (submitBtn) {
-                    if (currentUser.acknowledged) {
-                        submitBtn.disabled = true;
-                        submitBtn.textContent = 'Acknowledgement Submitted';
-                        submitBtn.style.backgroundColor = '#a0aec0';
-                    } else {
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Submit Acknowledgement';
-                        submitBtn.style.backgroundColor = '';
+                    if (submitBtn) {
+                        if (currentUser.acknowledged) {
+                            submitBtn.disabled = true;
+                            submitBtn.textContent = 'Acknowledgement Submitted';
+                            submitBtn.style.backgroundColor = '#a0aec0';
+                        } else {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Submit Acknowledgement';
+                            submitBtn.style.backgroundColor = '';
+                        }
                     }
                 }
             }
         }
-    }
 
-    function calculateProgress() {
-        if (!currentUser) return 0;
+        function calculateProgress() {
+            if (!currentUser) return 0;
 
-        const users = getUserDatabase();
-        const user = users[currentUser.email];
-        if (!user) return 0;
+            const users = getUserDatabase();
+            const user = users[currentUser.email];
+            if (!user) return 0;
 
-        const totalSections = 15;
-        const visitedCount = user.visitedSections?.length || 0;
-        const acknowledgementBonus = user.acknowledged ? 1 : 0;
+            const totalSections = 15;
+            const visitedCount = user.visitedSections?.length || 0;
+            const acknowledgementBonus = user.acknowledged ? 1 : 0;
 
-        const progress = Math.round(((visitedCount + acknowledgementBonus) / (totalSections + 1)) * 100);
+            const progress = Math.round(((visitedCount + acknowledgementBonus) / (totalSections + 1)) * 100);
 
-        user.progress = progress;
-        saveUserDatabase(users);
+            user.progress = progress;
+            saveUserDatabase(users);
 
-        const progressFill = document.getElementById('progress-fill');
-        const progressText = document.getElementById('progress-text');
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
 
-        if (progressFill) progressFill.style.width = `${progress}%`;
-        if (progressText) progressText.textContent = `${progress}% Complete`;
+            if (progressFill) progressFill.style.width = `${progress}%`;
+            if (progressText) progressText.textContent = `${progress}% Complete`;
 
-        return progress;
-    }
-
-    function trackSectionVisit(sectionId) {
-        if (!currentUser) return;
-
-        const users = getUserDatabase();
-        const user = users[currentUser.email];
-
-        if (!user.visitedSections) user.visitedSections = [];
-        if (!user.visitedSections.includes(sectionId)) {
-            user.visitedSections.push(sectionId);
+            return progress;
         }
 
-        user.lastActive = new Date().toISOString();
-        saveUserDatabase(users);
-        calculateProgress();
-    }
+        function trackSectionVisit(sectionId) {
+            if (!currentUser) return;
 
-    // ========== SECURITY FUNCTIONS ==========
-    function validatePasswordStrength(password) {
-        const requirements = {
-            length: password.length >= 6,
-            hasNumber: /\d/.test(password),
-            hasLetter: /[a-zA-Z]/.test(password)
-        };
+            const users = getUserDatabase();
+            const user = users[currentUser.email];
 
-        if (!requirements.length) return 'Password must be at least 6 characters';
-        if (!requirements.hasNumber) return 'Password must contain at least one number';
-        if (!requirements.hasLetter) return 'Password must contain at least one letter';
-        return null;
-    }
+            if (!user.visitedSections) user.visitedSections = [];
+            if (!user.visitedSections.includes(sectionId)) {
+                user.visitedSections.push(sectionId);
+            }
 
-    function hashPassword(password) {
-        let hash = 0;
-        for (let i = 0; i < password.length; i++) {
-            const char = password.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
+            user.lastActive = new Date().toISOString();
+            saveUserDatabase(users);
+            calculateProgress();
         }
-        return hash.toString();
-    }
 
-    function getUserDatabase() {
-        const encrypted = localStorage.getItem('decadesBarUsers');
-        if (!encrypted) return {};
+        // ========== SECURITY FUNCTIONS ==========
+        function validatePasswordStrength(password) {
+            const requirements = {
+                length: password.length >= 6,
+                hasNumber: /\d/.test(password),
+                hasLetter: /[a-zA-Z]/.test(password)
+            };
 
-        try {
-            const decoded = atob(encrypted);
-            return JSON.parse(decoded);
-        } catch (e) {
-            console.error('Error reading user database');
-            return {};
+            if (!requirements.length) return 'Password must be at least 6 characters';
+            if (!requirements.hasNumber) return 'Password must contain at least one number';
+            if (!requirements.hasLetter) return 'Password must contain at least one letter';
+            return null;
         }
-    }
 
-    function saveUserDatabase(users) {
-        try {
-            const encoded = btoa(JSON.stringify(users));
-            localStorage.setItem('decadesBarUsers', encoded);
-        } catch (e) {
-            console.error('Error saving user database');
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString();
         }
-    }
 
-    // ========== USER MANAGEMENT ==========
-    let currentUser = null;
-    let loginAttempts = JSON.parse(localStorage.getItem('loginAttempts')) || {};
+        function getUserDatabase() {
+            const encrypted = localStorage.getItem('decadesBarUsers');
+            if (!encrypted) return {};
 
-    function isAdmin(user) {
-        const adminPositions = ['Admin'];
-        return adminPositions.includes(user.position);
-    }
+            try {
+                const decoded = atob(encrypted);
+                return JSON.parse(decoded);
+            } catch (e) {
+                console.error('Error reading user database');
+                return {};
+            }
+        }
 
-    function startUserSession(user) {
-        currentUser = {
-            ...user,
-            isAdmin: isAdmin(user)
-        };
+        function saveUserDatabase(users) {
+            try {
+                const encoded = btoa(JSON.stringify(users));
+                localStorage.setItem('decadesBarUsers', encoded);
+            } catch (e) {
+                console.error('Error saving user database');
+            }
+        }
 
-        localStorage.setItem('currentSession', JSON.stringify({
-            user: currentUser,
-            loginTime: new Date().toISOString(),
-            expires: new Date(Date.now() + SECURITY_CONFIG.sessionTimeout).toISOString()
-        }));
-    }
+        // ========== USER MANAGEMENT ==========
+        let currentUser = null;
+        let loginAttempts = JSON.parse(localStorage.getItem('loginAttempts')) || {};
 
-    function validateSession() {
+        function isAdmin(user) {
+            if (!user) return false;
+            const adminPositions = ['Admin'];
+            return adminPositions.includes(user.position);
+        }
+
+        function startUserSession(user) {
+            currentUser = {
+                ...user,
+                isAdmin: isAdmin(user)
+            };
+
+            localStorage.setItem('currentSession', JSON.stringify({
+                user: currentUser,
+                loginTime: new Date().toISOString(),
+                expires: new Date(Date.now() + SECURITY_CONFIG.sessionTimeout).toISOString()
+            }));
+        }
+
+        function validateSession() {
             const session = localStorage.getItem('currentSession');
             if (!session) return false;
 
@@ -4145,39 +4148,38 @@
             }
         }
 
-    function endUserSession() {
+        function endUserSession() {
             currentUser = null;
             localStorage.removeItem('currentSession');
-            // Also clear any other session-related data
             localStorage.removeItem('loginAttempts');
         }
 
-    // ========== LOGIN/REGISTRATION FUNCTIONS ==========
-    async function performLogin(email, password) {
-        if (!email || !password) {
-            throw new Error('Please enter both email and password');
+        // ========== LOGIN/REGISTRATION FUNCTIONS ==========
+        async function performLogin(email, password) {
+            if (!email || !password) {
+                throw new Error('Please enter both email and password');
+            }
+
+            const users = getUserDatabase();
+            const user = users[email];
+
+            if (!user) {
+                throw new Error('Invalid email or password');
+            }
+
+            if (user.status === 'blocked') {
+                throw new Error('Account has been blocked. Please contact management.');
+            }
+
+            const hashedPassword = hashPassword(password);
+            if (user.passwordHash !== hashedPassword) {
+                throw new Error('Invalid email or password');
+            }
+
+            return user;
         }
 
-        const users = getUserDatabase();
-        const user = users[email];
-
-        if (!user) {
-            throw new Error('Invalid email or password');
-        }
-
-        if (user.status === 'blocked') {
-            throw new Error('Account has been blocked. Please contact management.');
-        }
-
-        const hashedPassword = hashPassword(password);
-        if (user.passwordHash !== hashedPassword) {
-            throw new Error('Invalid email or password');
-        }
-
-        return user;
-    }
-
-    async function performRegistration(userData) {
+        async function performRegistration(userData) {
             const { name, email, position, code, password, confirmPassword } = userData;
 
             // Basic validation
@@ -4200,15 +4202,15 @@
 
             // === ADMIN REGISTRATION SAFEGUARDS ===
             const adminPositions = ['Admin'];
-            const regularPositions = ['Manager', 'Bartender','Trainee'];
+            const regularPositions = ['Manager', 'Bartender', 'Trainee'];
 
             // Check if user is trying to register an admin position
             if (adminPositions.includes(position)) {
                 // Only these codes can create admin users
-                const adminOnlyCodes = ['MANAGER2024', 'DECADESADMIN'];
+                const adminOnlyCodes = ['MANAGER2025', 'DECADESADMIN'];
 
                 if (!adminOnlyCodes.includes(code)) {
-                    throw new Error('Administrative positions require manager authorization codes. Please use MANAGER2024 or DECADESADMIN.');
+                    throw new Error('Administrative positions require manager authorization codes. Please use MANAGER2025 or DECADESADMIN.');
                 }
 
                 // Additional security: Check if any admin already exists
@@ -4224,7 +4226,7 @@
 
             // Prevent regular codes from creating admin positions
             if (adminPositions.includes(position)) {
-                const regularCodes = ['DECADES2024', 'BARSTAFF2024', 'ADMIN'];
+                const regularCodes = ['BARSTAFF2025'];
                 if (regularCodes.includes(code)) {
                     throw new Error('This registration code cannot be used for administrative positions. Please use a manager authorization code.');
                 }
@@ -4255,9 +4257,8 @@
             saveUserDatabase(users);
             return users[email];
         }
-    // ========== MODAL FUNCTIONS ==========
 
-    // Update your closeAllModals function to clear forms
+        // ========== MODAL FUNCTIONS ==========
         function closeAllModals() {
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.style.display = 'none';
@@ -4272,34 +4273,232 @@
                 document.getElementById('register-code').value = '';
                 document.getElementById('register-password').value = '';
                 document.getElementById('register-confirm-password').value = '';
-                document.getElementById('password-strength').textContent = '';
+                const strengthElement = document.getElementById('password-strength');
+                if (strengthElement) strengthElement.textContent = '';
             }
         }
 
-    function openRegisterModal() {
-        document.getElementById('registerModal').style.display = 'block';
-    }
+        function openRegisterModal() {
+            document.getElementById('registerModal').style.display = 'block';
+        }
 
-    // ========== ADMIN FUNCTIONS ==========
-        function isAdmin(user) {
-                if (!user) {
-                    console.log('isAdmin: No user provided');
-                    return false;
+        // ========== TEST SYSTEM ==========
+        const testQuestions = [
+            {
+                id: 1,
+                question: "What is the standard pour for a shot of liquor?",
+                options: [
+                    { text: "1 oz", correct: false },
+                    { text: "1.5 oz", correct: true },
+                    { text: "2 oz", correct: false },
+                    { text: "2.5 oz", correct: false }
+                ],
+                feedback: "The standard pour for a shot is 1.5 oz."
+            },
+            {
+                id: 2,
+                question: "Which glass should be used for a Manhattan cocktail?",
+                options: [
+                    { text: "Highball glass", correct: false },
+                    { text: "Martini glass", correct: true },
+                    { text: "Rocks glass", correct: false },
+                    { text: "Shot glass", correct: false }
+                ],
+                feedback: "A Manhattan is typically served in a Martini glass."
+            },
+            {
+                id: 3,
+                question: "What is the correct procedure for checking ID?",
+                options: [
+                    { text: "Check only if they look under 30", correct: false },
+                    { text: "Check every customer who appears under 40", correct: true },
+                    { text: "Check only on weekends", correct: false },
+                    { text: "Never check regular customers", correct: false }
+                ],
+                feedback: "Always check ID for customers who appear under 40."
+            },
+            {
+                id: 4,
+                question: "Which of these is NOT a sign of intoxication?",
+                options: [
+                    { text: "Slurred speech", correct: false },
+                    { text: "Buying drinks for others", correct: true },
+                    { text: "Spilling drinks", correct: false },
+                    { text: "Being overly friendly", correct: false }
+                ],
+                feedback: "Buying drinks for others is not necessarily a sign of intoxication."
+            }
+        ];
+
+        function initializeTest() {
+            const testSection = document.getElementById('tests');
+            const testNavItem = document.getElementById('tests-nav-item');
+
+            console.log('Initializing tests, ENABLE_TESTS:', ENABLE_TESTS);
+
+            if (!ENABLE_TESTS) {
+                // Hide test section and nav item if disabled
+                if (testSection) {
+                    testSection.style.display = 'none';
+                    testSection.classList.add('tests-disabled');
+                }
+                if (testNavItem) {
+                    testNavItem.style.display = 'none';
+                    testNavItem.classList.add('tests-disabled');
+                }
+                return;
+            } else {
+                // Show test section and nav item if enabled
+                if (testSection) {
+                    testSection.style.display = 'block';
+                    testSection.classList.remove('tests-disabled');
+                }
+                if (testNavItem) {
+                    testNavItem.style.display = 'list-item';
+                    testNavItem.classList.remove('tests-disabled');
                 }
 
-                // Check both position and role fields
-                const userPosition = user.position || user.role || '';
-                const adminPositions = ['Admin'];
-                const isUserAdmin = adminPositions.includes(userPosition);
+                // Generate test questions
+                const test1Questions = document.getElementById('test1-questions');
+                if (test1Questions) {
+                    test1Questions.innerHTML = '';
 
-                console.log('Admin check:', {
-                    name: user.name,
-                    position: userPosition,
-                    isAdmin: isUserAdmin
+                    testQuestions.forEach((q, index) => {
+                        const questionElement = document.createElement('div');
+                        questionElement.className = 'test-question';
+                        questionElement.innerHTML = `
+                <p><strong>${index + 1}. ${q.question}</strong></p>
+                ${q.options.map((opt, i) => `
+                  <label style="display: block; margin: 5px 0;">
+                    <input type="radio" name="q${q.id}" value="${i}">
+                    ${opt.text}
+                  </label>
+                `).join('')}
+                <div class="test-feedback" id="feedback-${q.id}" style="display: none;"></div>
+              `;
+                        test1Questions.appendChild(questionElement);
+                    });
+                }
+            }
+        }
+
+        function submitTest(testNumber) {
+            if (testNumber === 1) {
+                let score = 0;
+                const totalQuestions = testQuestions.length;
+
+                testQuestions.forEach(q => {
+                    const selectedOption = document.querySelector(`input[name="q${q.id}"]:checked`);
+                    const questionElement = document.querySelector(`#test1-questions .test-question:nth-child(${q.id})`);
+                    const feedbackElement = document.getElementById(`feedback-${q.id}`);
+
+                    if (!selectedOption) {
+                        // No answer selected
+                        if (questionElement) questionElement.classList.remove('correct', 'incorrect');
+                        if (feedbackElement) {
+                            feedbackElement.textContent = "Please select an answer.";
+                            feedbackElement.className = 'test-feedback';
+                            feedbackElement.style.display = 'block';
+                        }
+                        return;
+                    }
+
+                    const selectedIndex = parseInt(selectedOption.value);
+                    const isCorrect = q.options[selectedIndex].correct;
+
+                    if (isCorrect) {
+                        score++;
+                        if (questionElement) {
+                            questionElement.classList.add('correct');
+                            questionElement.classList.remove('incorrect');
+                        }
+                        if (feedbackElement) {
+                            feedbackElement.textContent = "Correct! " + q.feedback;
+                            feedbackElement.className = 'test-feedback correct';
+                            feedbackElement.style.display = 'block';
+                        }
+                    } else {
+                        if (questionElement) {
+                            questionElement.classList.add('incorrect');
+                            questionElement.classList.remove('correct');
+                        }
+                        if (feedbackElement) {
+                            feedbackElement.textContent = "Incorrect. " + q.feedback;
+                            feedbackElement.className = 'test-feedback incorrect';
+                            feedbackElement.style.display = 'block';
+                        }
+                    }
                 });
 
-                return isUserAdmin;
+                // Display results
+                const percentage = Math.round((score / totalQuestions) * 100);
+                const resultsElement = document.getElementById('test-results');
+
+                if (resultsElement) {
+                    resultsElement.innerHTML = `
+              <div class="test-score ${percentage >= 70 ? 'test-pass' : 'test-fail'}">
+                Score: ${score}/${totalQuestions} (${percentage}%)
+              </div>
+              <p>${percentage >= 70 ?
+                            'Congratulations! You passed the test.' :
+                            'Please review the materials and try again.'}
+              </p>
+              <p><strong>Your test results have been recorded and are visible to management.</strong></p>
+              <button class="btn" onclick="resetTest(1)" style="margin-top: 10px;">
+                Retake Test
+              </button>
+            `;
+                }
+
+                // Save test results to user database
+                if (currentUser) {
+                    const users = getUserDatabase();
+                    const user = users[currentUser.email];
+
+                    if (user) {
+                        if (!user.testResults) user.testResults = {};
+                        user.testResults[`test${testNumber}`] = {
+                            score: score,
+                            total: totalQuestions,
+                            percentage: percentage,
+                            passed: percentage >= 70,
+                            date: new Date().toISOString(),
+                            testName: "Bartending Fundamentals"
+                        };
+
+                        saveUserDatabase(users);
+                        showToast('Test results saved successfully!');
+                    }
+                }
             }
+        }
+
+        function resetTest(testNumber) {
+            if (testNumber === 1) {
+                // Clear all selections
+                document.querySelectorAll('#test1-questions input[type="radio"]').forEach(input => {
+                    input.checked = false;
+                });
+
+                // Reset question styling
+                document.querySelectorAll('#test1-questions .test-question').forEach(q => {
+                    q.classList.remove('correct', 'incorrect');
+                });
+
+                // Hide feedback
+                document.querySelectorAll('.test-feedback').forEach(feedback => {
+                    feedback.style.display = 'none';
+                });
+
+                // Clear results
+                const resultsElement = document.getElementById('test-results');
+                if (resultsElement) {
+                    resultsElement.innerHTML = '<p>No tests submitted yet.</p>';
+                }
+            }
+        }
+
+        // ========== ADMIN FUNCTIONS ==========
         function refreshAdminData() {
             if (!currentUser || !isAdmin(currentUser)) {
                 alert('Admin access required');
@@ -4307,6 +4506,7 @@
             }
             updateAdminStats();
             displayAdminUserList();
+            displayAdminTestResults();
         }
 
         function updateAdminStats() {
@@ -4320,15 +4520,15 @@
             const acknowledgedCount = userArray.filter(u => u.acknowledged).length;
 
             const statsHtml = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div><strong>Total Users:</strong> ${totalUsers}</div>
             <div><strong>Active:</strong> ${activeUsers}</div>
             <div><strong>Blocked:</strong> ${blockedUsers}</div>
             <div><strong>Completed Training:</strong> ${completedTraining}</div>
             <div><strong>Submitted Acknowledgements:</strong> ${acknowledgedCount}</div>
             <div><strong>Completion Rate:</strong> ${totalUsers ? Math.round((completedTraining / totalUsers) * 100) : 0}%</div>
-        </div>
-    `;
+          </div>
+        `;
 
             const statsElement = document.getElementById('admin-stats');
             if (statsElement) {
@@ -4342,26 +4542,28 @@
             const users = getUserDatabase();
             const container = document.getElementById('admin-user-list');
 
+            if (!container) return;
+
             if (Object.keys(users).length === 0) {
                 container.innerHTML = '<p>No users found.</p>';
                 return;
             }
 
             let html = `
-        <div style="overflow-x: auto;">
+          <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                <thead>
-                    <tr style="background: #f8f9fa;">
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Name</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Email</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Position</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Progress</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Status</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
+              <thead>
+                <tr style="background: #f8f9fa;">
+                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Name</th>
+                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Email</th>
+                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Position</th>
+                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Progress</th>
+                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Status</th>
+                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
 
             Object.entries(users).forEach(([email, user]) => {
                 const progressColor = user.progress >= 100 ? 'green' :
@@ -4377,21 +4579,21 @@
 
                 html += `
             <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 12px;">${user.name}</td>
-                <td style="padding: 12px;">${email}</td>
-                <td style="padding: 12px;">${user.position}</td>
-                <td style="padding: 12px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 60px; height: 8px; background: #e2e8f0; border-radius: 4px;">
-                            <div style="width: ${user.progress || 0}%; height: 100%; background: ${progressColor}; border-radius: 4px;"></div>
-                        </div>
-                        <span>${user.progress || 0}%</span>
-                    </div>
-                </td>
-                <td style="padding: 12px;">${status}</td>
-                <td style="padding: 12px;">${actionButton}</td>
+              <td style="padding: 12px;">${user.name}</td>
+              <td style="padding: 12px;">${email}</td>
+              <td style="padding: 12px;">${user.position}</td>
+              <td style="padding: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: 60px; height: 8px; background: #e2e8f0; border-radius: 4px;">
+                    <div style="width: ${user.progress || 0}%; height: 100%; background: ${progressColor}; border-radius: 4px;"></div>
+                  </div>
+                  <span>${user.progress || 0}%</span>
+                </div>
+              </td>
+              <td style="padding: 12px;">${status}</td>
+              <td style="padding: 12px;">${actionButton}</td>
             </tr>
-        `;
+          `;
             });
 
             html += `</tbody></table></div>`;
@@ -4431,7 +4633,10 @@
         }
 
         function toggleUserBlock() {
-            const email = document.getElementById('admin-user-email').value.trim();
+            const emailInput = document.getElementById('admin-user-email');
+            if (!emailInput) return;
+
+            const email = emailInput.value.trim();
             if (!email) {
                 alert('Please enter an email address');
                 return;
@@ -4449,1001 +4654,793 @@
                 blockUser(email);
             }
 
-            document.getElementById('admin-user-email').value = '';
+            emailInput.value = '';
         }
 
-            // ========== EVENT LISTENERS ==========
-            document.addEventListener('DOMContentLoaded', function () {
-        // Navigation
-        document.querySelectorAll('.nav-links li').forEach(item => {
-            item.addEventListener('click', function () {
-                const targetId = this.getAttribute('data-target');
+        function displayAdminTestResults() {
+            if (!currentUser || !isAdmin(currentUser)) return;
 
-                // === ADD THIS ADMIN CHECK ===
-                if (targetId === 'admin-panel' && currentUser && !isAdmin(currentUser)) {
-                    alert('Admin access required');
-                    return;
-                }
-                // === END ADMIN CHECK ===
+            const container = document.getElementById('admin-test-results');
+            if (!container) return;
 
-                document.querySelectorAll('.nav-links li').forEach(li => {
-                    li.classList.remove('active');
+            const users = getUserDatabase();
+            let html = '<h4 style="margin-bottom: 15px;">Employee Test Results</h4>';
+
+            // Check if any users have test results
+            const usersWithResults = Object.entries(users).filter(([email, user]) =>
+                user.testResults && Object.keys(user.testResults).length > 0
+            );
+
+            if (usersWithResults.length === 0) {
+                html += '<p>No test results available.</p>';
+                container.innerHTML = html;
+                return;
+            }
+
+            html += `
+          <table class="test-results-table">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Position</th>
+                <th>Test</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+            usersWithResults.forEach(([email, user]) => {
+                Object.entries(user.testResults).forEach(([testId, result]) => {
+                    const date = new Date(result.date);
+                    const formattedDate = date.toLocaleDateString();
+
+                    html += `
+              <tr>
+                <td>${user.name}</td>
+                <td>${user.position}</td>
+                <td>${result.testName || testId}</td>
+                <td>${result.score}/${result.total} (${result.percentage}%)</td>
+                <td>
+                  <span class="${result.passed ? 'test-pass-badge' : 'test-fail-badge'}">
+                    ${result.passed ? 'Passed' : 'Failed'}
+                  </span>
+                </td>
+                <td>${formattedDate}</td>
+              </tr>
+            `;
                 });
-                this.classList.add('active');
-
-                document.querySelectorAll('.section').forEach(section => {
-                    section.classList.remove('active');
-                });
-
-                document.getElementById(targetId).classList.add('active');
-                document.getElementById('page-title').textContent = this.querySelector('a').textContent.trim();
-
-                // === ADD THIS: Refresh admin data when admin panel is accessed ===
-                if (targetId === 'admin-panel' && currentUser && isAdmin(currentUser)) {
-                    setTimeout(refreshAdminData, 100);
-                }
-                // === END ADMIN REFRESH ===
-
-                if (!document.getElementById(targetId).classList.contains('visited')) {
-                    document.getElementById(targetId).classList.add('visited');
-                    calculateProgress();
-                }
             });
 
-        });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
 
-        // Show/hide admin menu based on user role
-        function setupAdminMenu() {
-            const adminNavItem = document.querySelector('[data-target="admin-panel"]');
-            console.log('setupAdminMenu called - currentUser:', currentUser); // Debug line
+        // ========== EMPLOYEE COUNSELING SYSTEM ==========
+        function initializeCounselingSystem() {
+            // Populate employee dropdown
+            const employeeSelect = document.getElementById('counseling-employee');
+            if (employeeSelect) {
+                employeeSelect.innerHTML = '<option value="">Select Employee</option>';
+
+                const users = getUserDatabase();
+                Object.values(users).forEach(user => {
+                    if (user.position !== 'Admin') {
+                        const option = document.createElement('option');
+                        option.value = user.email;
+                        option.textContent = `${user.name} (${user.position})`;
+                        employeeSelect.appendChild(option);
+                    }
+                });
+            }
+
+            // Load existing counseling records
+            loadCounselingRecords();
+        }
+
+        function loadCounselingRecords() {
+            const recordsContainer = document.getElementById('counseling-records');
+            if (!recordsContainer) return;
+
+            const counselings = JSON.parse(localStorage.getItem('decadesCounselings')) || [];
+
+            if (counselings.length === 0) {
+                recordsContainer.innerHTML = '<h4>Previous Records</h4><p>No counseling records found.</p>';
+                return;
+            }
+
+            let html = '<h4>Previous Records</h4>';
+
+            counselings.forEach((record, index) => {
+                const date = new Date(record.date);
+                const typeClass = record.type === 'verbal' ? 'counseling-warning' :
+                    record.type === 'written' ? 'counseling-writeup' : '';
+
+                html += `
+            <div class="counseling-record ${typeClass}">
+              <div class="counseling-date">
+                ${date.toLocaleDateString()} - ${record.employeeName}
+                <span class="counseling-type" style="background: ${getCounselingColor(record.type)}; color: white;">
+                  ${record.type.charAt(0).toUpperCase() + record.type.slice(1)}
+                </span>
+              </div>
+              <p><strong>Reason:</strong> ${record.reason}</p>
+              <p><strong>Action Plan:</strong> ${record.action}</p>
+              <button class="btn-logout" onclick="deleteCounselingRecord(${index})" style="margin-top: 10px;">Delete Record</button>
+            </div>
+          `;
+            });
+
+            recordsContainer.innerHTML = html;
+        }
+
+        function getCounselingColor(type) {
+            switch (type) {
+                case 'verbal': return '#ffc107';
+                case 'written': return '#fd7e14';
+                case 'suspension': return '#dc3545';
+                case 'termination': return '#6c757d';
+                default: return '#6c757d';
+            }
+        }
+
+        function saveCounselingRecord() {
+            const employeeEmail = document.getElementById('counseling-employee').value;
+            const type = document.getElementById('counseling-type').value;
+            const date = document.getElementById('counseling-date').value;
+            const reason = document.getElementById('counseling-reason').value;
+            const action = document.getElementById('counseling-action').value;
+
+            if (!employeeEmail || !date || !reason) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            // Get employee name
+            const users = getUserDatabase();
+            const employee = users[employeeEmail];
+            if (!employee) {
+                alert('Employee not found.');
+                return;
+            }
+
+            const counselings = JSON.parse(localStorage.getItem('decadesCounselings')) || [];
+
+            counselings.push({
+                employeeEmail: employeeEmail,
+                employeeName: employee.name,
+                type: type,
+                date: date,
+                reason: reason,
+                action: action,
+                recordedBy: currentUser.name,
+                recordedDate: new Date().toISOString()
+            });
+
+            localStorage.setItem('decadesCounselings', JSON.stringify(counselings));
+
+            // Clear form
+            document.getElementById('counseling-reason').value = '';
+            document.getElementById('counseling-action').value = '';
+
+            // Reload records
+            loadCounselingRecords();
+
+            showToast('Counseling record saved successfully.');
+        }
+
+        function deleteCounselingRecord(index) {
+            if (!confirm('Are you sure you want to delete this counseling record?')) return;
+
+            const counselings = JSON.parse(localStorage.getItem('decadesCounselings')) || [];
+            counselings.splice(index, 1);
+            localStorage.setItem('decadesCounselings', JSON.stringify(counselings));
+
+            loadCounselingRecords();
+            showToast('Counseling record deleted.');
+        }
+
+        // ========== SCHEDULE REPORT SYSTEM ==========
+        function uploadSchedule() {
+            const scheduleHTML = document.getElementById('schedule-html').value;
+
+            if (!scheduleHTML) {
+                alert('Please paste HTML content to upload.');
+                return;
+            }
+
+            localStorage.setItem('decadesSchedule', scheduleHTML);
+            document.getElementById('schedule-html').value = '';
+
+            displaySchedule();
+            showToast('Schedule uploaded successfully.');
+        }
+
+        function displaySchedule() {
+            const schedulePreview = document.getElementById('schedule-preview');
+            const scheduleHTML = localStorage.getItem('decadesSchedule');
+
+            if (!scheduleHTML) {
+                schedulePreview.innerHTML = '<h4>Current Schedule</h4><p>No schedule has been uploaded yet.</p>';
+                return;
+            }
+
+            schedulePreview.innerHTML = `
+          <h4>Current Schedule</h4>
+          <div style="overflow-x: auto;">
+            ${scheduleHTML}
+          </div>
+          <button class="btn-logout" onclick="clearSchedule()" style="margin-top: 15px;">Clear Schedule</button>
+        `;
+        }
+
+        function clearSchedule() {
+            if (!confirm('Are you sure you want to clear the current schedule?')) return;
+
+            localStorage.removeItem('decadesSchedule');
+            displaySchedule();
+            showToast('Schedule cleared.');
+        }
+
+        // ========== ADMIN NAVIGATION SETUP ==========
+        function setupAdminNavigation() {
+            const counselingsNavItem = document.getElementById('counselings-nav-item');
+            const scheduleNavItem = document.getElementById('schedule-nav-item');
+            const adminNavItem = document.getElementById('admin-nav-item');
+
+            console.log('Setting up admin navigation, currentUser:', currentUser);
 
             if (currentUser && isAdmin(currentUser)) {
-                console.log('User is admin, showing menu'); // Debug line
-                if (adminNavItem) adminNavItem.style.display = 'block';
+                // Show admin sections
+                if (counselingsNavItem) counselingsNavItem.style.display = 'list-item';
+                if (scheduleNavItem) scheduleNavItem.style.display = 'list-item';
+                if (adminNavItem) adminNavItem.style.display = 'list-item';
+
+                // Initialize admin systems
+                initializeCounselingSystem();
+                displaySchedule();
             } else {
-                console.log('User is not admin, hiding menu'); // Debug line
+                // Hide admin sections
+                if (counselingsNavItem) counselingsNavItem.style.display = 'none';
+                if (scheduleNavItem) scheduleNavItem.style.display = 'none';
                 if (adminNavItem) adminNavItem.style.display = 'none';
             }
         }
 
-        setupAdminMenu();
-        
+        // ========== BAR CLEANING CALENDAR ==========
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let cleaningDays = JSON.parse(localStorage.getItem('decadesCleaningDays')) || [];
 
-        // FAQ toggle
-        document.querySelectorAll('.faq-question').forEach(question => {
-            question.addEventListener('click', function () {
-                const faqItem = this.parentElement;
-                faqItem.classList.toggle('active');
+        function generateCalendar(month, year) {
+            const calendarElement = document.getElementById('cleaning-calendar');
+            if (!calendarElement) return;
+
+            // Clear existing content
+            calendarElement.innerHTML = '';
+
+            // Create day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day-header';
+                dayElement.textContent = day;
+                calendarElement.appendChild(dayElement);
             });
-        });
 
-        // Progress tracking
-        const acknowledgementCheckbox = document.getElementById('acknowledgement');
-        const submitBtn = document.getElementById('submit-btn');
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        if (submitBtn) {
-            submitBtn.addEventListener('click', function () {
-                if (acknowledgementCheckbox.checked) {
-                    if (!currentUser) return;
+            // Add empty days for alignment
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                calendarElement.appendChild(emptyDay);
+            }
 
-                    const users = getUserDatabase();
-                    const user = users[currentUser.email];
+            // Add days of the month
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
 
-                    user.acknowledged = true;
-                    user.acknowledgementDate = new Date().toISOString();
-                    user.progress = 100;
-
-                    saveUserDatabase(users);
-
-                    const progressFill = document.getElementById('progress-fill');
-                    const progressText = document.getElementById('progress-text');
-
-                    if (progressFill) progressFill.style.width = '100%';
-                    if (progressText) progressText.textContent = '100% Complete';
-
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = 'Acknowledgement Submitted';
-                    submitBtn.style.backgroundColor = '#a0aec0';
-
-                    showToast('Acknowledgement submitted successfully!');
-                    calculateProgress();
-                } else {
-                    alert('Please check the acknowledgement box before submitting.');
+                // Check if today
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayElement.classList.add('today');
                 }
-            });
+
+                // Check if cleaning day
+                const dateStr = `${year}-${month + 1}-${day}`;
+                if (cleaningDays.includes(dateStr)) {
+                    dayElement.classList.add('cleaning-day');
+                }
+
+                dayElement.innerHTML = `
+            <div>${day}</div>
+            ${cleaningDays.includes(dateStr) ? '<div class="cleaning-indicator">Cleaning</div>' : ''}
+          `;
+
+                // Add click event to toggle cleaning day
+                dayElement.addEventListener('click', () => toggleCleaningDay(year, month, day));
+
+                calendarElement.appendChild(dayElement);
+            }
         }
 
-        // Initialize progress
-        if (document.getElementById('welcome')) {
-            document.getElementById('welcome').classList.add('visited');
-            calculateProgress();
+        function toggleCleaningDay(year, month, day) {
+            const dateStr = `${year}-${month + 1}-${day}`;
+            const index = cleaningDays.indexOf(dateStr);
+
+            if (index > -1) {
+                // Remove if already exists
+                cleaningDays.splice(index, 1);
+            } else {
+                // Add if not exists
+                cleaningDays.push(dateStr);
+            }
+
+            // Save to localStorage
+            localStorage.setItem('decadesCleaningDays', JSON.stringify(cleaningDays));
+
+            // Regenerate calendar
+            generateCalendar(currentMonth, currentYear);
         }
 
-        // ========== LOGIN/REGISTRATION EVENT LISTENERS ==========
+        function changeMonth(direction) {
+            currentMonth += direction;
 
-        // Direct barrier login
-        document.getElementById('direct-login').addEventListener('click', async function () {
-            const email = document.getElementById('direct-email').value.trim();
-            const password = document.getElementById('direct-password').value;
-
-            if (!email) {
-                alert('Please enter your email');
-                return;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
             }
 
-            try {
-                const user = await performLogin(email, password);
-
-                // Update login count
-                const users = getUserDatabase();
-                if (users[email]) {
-                    users[email].loginCount = (users[email].loginCount || 0) + 1;
-                    users[email].lastLogin = new Date().toISOString();
-                    saveUserDatabase(users);
-                }
-
-                startUserSession({
-                    name: user.name,
-                    role: user.position,
-                    email: user.email,
-                    id: user.email,
-                    progress: user.progress || 0,
-                    acknowledged: user.acknowledged || false,
-                    loginTime: new Date().toISOString()
-                });
-
-                document.getElementById('login-barrier').style.display = 'none';
-                document.querySelector('.container').style.display = 'flex';
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('user-display').style.display = 'flex';
-                document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
-                document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
-
-                showToast(`Welcome back, ${user.name}!`);
-                updateProgressDisplay();
-                setupAdminMenu();
-
-            } catch (error) {
-                alert(error.message);
-            }
-        });
-
-        // Direct barrier register
-        document.getElementById('direct-register').addEventListener('click', function () {
-            openRegisterModal();
-        });
-
-        // Registration form submission
-        document.getElementById('register-submit-btn').addEventListener('click', async function () {
-            const name = document.getElementById('register-name').value.trim();
-            const email = document.getElementById('register-email').value.trim();
-            const position = document.getElementById('register-position').value;
-            const code = document.getElementById('register-code').value.trim();
-            const password = document.getElementById('register-password').value;
-            const confirmPassword = document.getElementById('register-confirm-password').value;
-
-            try {
-                const user = await performRegistration({
-                    name, email, position, code, password, confirmPassword
-                });
-
-                startUserSession({
-                    name: user.name,
-                    role: user.position,
-                    email: user.email,
-                    id: user.email,
-                    progress: 0,
-                    acknowledged: false,
-                    loginTime: new Date().toISOString()
-                });
-
-                document.getElementById('login-barrier').style.display = 'none';
-                document.querySelector('.container').style.display = 'flex';
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('user-display').style.display = 'flex';
-                document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
-                document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
-                closeAllModals();
-
-                document.getElementById('register-name').value = '';
-                document.getElementById('register-email').value = '';
-                document.getElementById('register-code').value = '';
-                document.getElementById('register-password').value = '';
-                document.getElementById('register-confirm-password').value = '';
-
-                showToast(`Welcome to Decades Bar, ${user.name}!`);
-                updateProgressDisplay();
-                setupAdminMenu();
-
-            } catch (error) {
-                alert(error.message);
-            }
-        });
-
-        // Password strength indicator
-        document.getElementById('register-password').addEventListener('input', function () {
-            const password = this.value;
-            const confirmPassword = document.getElementById('register-confirm-password').value;
-            const strengthElement = document.getElementById('password-strength');
-
-            if (!strengthElement) return;
-
-            if (password.length === 0) {
-                strengthElement.textContent = '';
-                strengthElement.style.color = '';
-                return;
-            }
-
-            if (confirmPassword.length > 0) {
-                if (password !== confirmPassword) {
-                    strengthElement.textContent = '✗ Passwords do not match';
-                    strengthElement.style.color = '#e53e3e';
-                } else {
-                    const strengthError = validatePasswordStrength(password);
-                    if (strengthError) {
-                        strengthElement.textContent = `✓ Passwords match - but ${strengthError.toLowerCase()}`;
-                        strengthElement.style.color = '#ed8936';
-                    } else {
-                        strengthElement.textContent = '✓ Passwords match and are strong';
-                        strengthElement.style.color = '#38a169';
-                    }
-                }
-            } else {
-                const strengthError = validatePasswordStrength(password);
-                if (strengthError) {
-                    strengthElement.textContent = strengthError;
-                    strengthElement.style.color = '#e53e3e';
-                } else {
-                    strengthElement.textContent = '✓ Password strength: Good';
-                    strengthElement.style.color = '#38a169';
-                }
-            }
-        });
-
-        // Password matching indicator
-        document.getElementById('register-confirm-password').addEventListener('input', function () {
-            const password = document.getElementById('register-password').value;
-            const confirmPassword = this.value;
-            const strengthElement = document.getElementById('password-strength');
-
-            if (!strengthElement) return;
-
-            if (confirmPassword.length === 0) {
-                if (password.length > 0) {
-                    const strengthError = validatePasswordStrength(password);
-                    if (strengthError) {
-                        strengthElement.textContent = strengthError;
-                        strengthElement.style.color = '#e53e3e';
-                    } else {
-                        strengthElement.textContent = '✓ Password strength: Good';
-                        strengthElement.style.color = '#38a169';
-                    }
-                } else {
-                    strengthElement.textContent = '';
-                }
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                strengthElement.textContent = '✗ Passwords do not match';
-                strengthElement.style.color = '#e53e3e';
-            } else {
-                const strengthError = validatePasswordStrength(password);
-                if (strengthError) {
-                    strengthElement.textContent = `✓ Passwords match - but ${strengthError.toLowerCase()}`;
-                    strengthElement.style.color = '#ed8936';
-                } else {
-                    strengthElement.textContent = '✓ Passwords match and are strong';
-                    strengthElement.style.color = '#38a169';
-                }
-            }
-        });
-
-         // Position validation when position changes
-        document.getElementById('register-position').addEventListener('change', function () {
-            const position = this.value;
-            const codeInput = document.getElementById('register-code');
-            const adminPositions = ['Admin'];
-
-            if (adminPositions.includes(position)) {
-                // Show warning for admin positions
-                codeInput.placeholder = "ADMIN required";
-                codeInput.style.borderColor = '#d4af37';
-                codeInput.style.backgroundColor = '#fffaf0';
-            } else {
-                // Reset for regular positions
-                codeInput.placeholder = "Enter registration code provided by manager";
-                codeInput.style.borderColor = '';
-                codeInput.style.backgroundColor = '';
-            }
-        });
-
-        // Code validation with position matching
-        document.getElementById('register-code').addEventListener('input', function () {
-            const code = this.value.trim();
-            const position = document.getElementById('register-position').value;
-            const adminPositions = ['Admin'];
-
-            if (code.length > 0) {
-                if (adminPositions.includes(position)) {
-                    const adminCodes = ['ADMIN'];
-                    if (!adminCodes.includes(code)) {
-                        this.style.borderColor = '#e53e3e';
-                        this.title = 'Admin positions require ADMIN codes';
-                    } else {
-                        this.style.borderColor = '#38a169';
-                        this.title = 'Valid admin code';
-                    }
-                } else {
-                    // Regular position code validation
-                    if (!APPROVED_CODES.includes(code)) {
-                        this.style.borderColor = '#e53e3e';
-                        this.title = 'Invalid registration code';
-                    } else {
-                        this.style.borderColor = '#38a169';
-                        this.title = 'Valid registration code';
-                    }
-                }
-            } else {
-                this.style.borderColor = '';
-                this.title = '';
-            }
-        });
-
-
-        // Modal controls
-        document.querySelectorAll('.close-modal, .btn-secondary').forEach(btn => {
-            btn.addEventListener('click', function () {
-                closeAllModals();
-            });
-        });
-
-        window.addEventListener('click', function (event) {
-            if (event.target.classList.contains('modal')) {
-                closeAllModals();
-            }
-        });
-
-        // Logout functionality
-        
-        document.getElementById('logout-btn').addEventListener('click', function () {
-            endUserSession();
-
-            // Clear all login/registration forms
-            document.getElementById('direct-email').value = '';
-            document.getElementById('direct-password').value = '';
-            document.getElementById('register-name').value = '';
-            document.getElementById('register-email').value = '';
-            document.getElementById('register-position').selectedIndex = 0;
-            document.getElementById('register-code').value = '';
-            document.getElementById('register-password').value = '';
-            document.getElementById('register-confirm-password').value = '';
-            document.getElementById('password-strength').textContent = '';
-
-            // Reset UI
-            document.getElementById('login-barrier').style.display = 'flex';
-            document.querySelector('.container').style.display = 'none';
-            document.getElementById('login-section').style.display = 'block';
-            document.getElementById('user-display').style.display = 'none';
-
-            setupAdminMenu();
-
-            showToast('Logged out successfully');
-
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
-        });
-
-        // Check for existing session
-        const validSession = validateSession();
-        if (validSession) {
-            currentUser = validSession;
-            document.getElementById('login-barrier').style.display = 'none';
-            document.querySelector('.container').style.display = 'flex';
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('user-display').style.display = 'flex';
-            document.getElementById('user-display-name').textContent = `${validSession.name} (${validSession.role})`;
-            document.getElementById('user-avatar').textContent = validSession.name.charAt(0).toUpperCase();
-            updateProgressDisplay();
-
-            setupAdminMenu();
+            generateCalendar(currentMonth, currentYear);
         }
 
-        // Auto-logout after session timeout
-        setInterval(() => {
-            if (currentUser && !validateSession()) {
-                alert('Your session has expired. Please log in again.');
-                endUserSession();
-                location.reload();
-            }
-        }, 60000);
+        // ========== EVENT LISTENERS ==========
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM Content Loaded - Initializing application');
 
-          // ========== CONFIGURATION ==========
-                // Set this to true to enable tests, false to hide them
-                const ENABLE_TESTS = true; // Set to true to show tests
+            // Initialize core systems
+            initializeTest();
+            generateCalendar(currentMonth, currentYear);
 
-                // ========== BAR CLEANING CALENDAR ==========
-                let currentMonth = new Date().getMonth();
-                let currentYear = new Date().getFullYear();
-                let cleaningDays = JSON.parse(localStorage.getItem('decadesCleaningDays')) || [];
+            // Navigation
+            document.querySelectorAll('.nav-links li').forEach(item => {
+                item.addEventListener('click', function () {
+                    const targetId = this.getAttribute('data-target');
 
-                function generateCalendar(month, year) {
-                    const calendarElement = document.getElementById('cleaning-calendar');
-                    if (!calendarElement) return;
+                    // Admin access check
+                    if ((targetId === 'admin-panel' || targetId === 'employee-counselings' || targetId === 'schedule-report') &&
+                        currentUser && !isAdmin(currentUser)) {
+                        alert('Admin access required');
+                        return;
+                    }
 
-                    // Clear existing content
-                    calendarElement.innerHTML = '';
+                    document.querySelectorAll('.nav-links li').forEach(li => {
+                        li.classList.remove('active');
+                    });
+                    this.classList.add('active');
 
-                    // Create day headers
-                    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                    dayHeaders.forEach(day => {
-                        const dayElement = document.createElement('div');
-                        dayElement.className = 'calendar-day-header';
-                        dayElement.textContent = day;
-                        calendarElement.appendChild(dayElement);
+                    document.querySelectorAll('.section').forEach(section => {
+                        section.classList.remove('active');
                     });
 
-                    // Get first day of month and number of days
-                    const firstDay = new Date(year, month, 1).getDay();
-                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                        document.getElementById('page-title').textContent = this.querySelector('a').textContent.trim();
 
-                    // Add empty days for alignment
-                    for (let i = 0; i < firstDay; i++) {
-                        const emptyDay = document.createElement('div');
-                        emptyDay.className = 'calendar-day empty';
-                        calendarElement.appendChild(emptyDay);
-                    }
-
-                    // Add days of the month
-                    const today = new Date();
-                    for (let day = 1; day <= daysInMonth; day++) {
-                        const dayElement = document.createElement('div');
-                        dayElement.className = 'calendar-day';
-
-                        // Check if today
-                        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                            dayElement.classList.add('today');
-                        }
-
-                        // Check if cleaning day
-                        const dateStr = `${year}-${month + 1}-${day}`;
-                        if (cleaningDays.includes(dateStr)) {
-                            dayElement.classList.add('cleaning-day');
-                        }
-
-                        dayElement.innerHTML = `
-                    <div>${day}</div>
-                    ${cleaningDays.includes(dateStr) ? '<div class="cleaning-indicator">Cleaning</div>' : ''}
-                `;
-
-                        // Add click event to toggle cleaning day
-                        dayElement.addEventListener('click', () => toggleCleaningDay(year, month, day));
-
-                        calendarElement.appendChild(dayElement);
-                    }
-
-                    // Update month/year display
-                    const monthYearElement = document.getElementById('calendar-month-year');
-                    if (monthYearElement) {
-                        const monthNames = ["January", "February", "March", "April", "May", "June",
-                            "July", "August", "September", "October", "November", "December"];
-                        monthYearElement.textContent = `${monthNames[month]} ${year}`;
-                    }
-                }
-
-                function toggleCleaningDay(year, month, day) {
-                    const dateStr = `${year}-${month + 1}-${day}`;
-                    const index = cleaningDays.indexOf(dateStr);
-
-                    if (index > -1) {
-                        // Remove if already exists
-                        cleaningDays.splice(index, 1);
-                    } else {
-                        // Add if not exists
-                        cleaningDays.push(dateStr);
-                    }
-
-                    // Save to localStorage
-                    localStorage.setItem('decadesCleaningDays', JSON.stringify(cleaningDays));
-
-                    // Regenerate calendar
-                    generateCalendar(currentMonth, currentYear);
-                }
-
-                function changeMonth(direction) {
-                    currentMonth += direction;
-
-                    if (currentMonth > 11) {
-                        currentMonth = 0;
-                        currentYear++;
-                    } else if (currentMonth < 0) {
-                        currentMonth = 11;
-                        currentYear--;
-                    }
-
-                    generateCalendar(currentMonth, currentYear);
-                }
-
-                // ========== TEST SYSTEM ==========
-                const testQuestions = [
-                    {
-                        id: 1,
-                        question: "What is the standard pour for a shot of liquor?",
-                        options: [
-                            { text: "1 oz", correct: false },
-                            { text: "1.5 oz", correct: true },
-                            { text: "2 oz", correct: false },
-                            { text: "2.5 oz", correct: false }
-                        ],
-                        feedback: "The standard pour for a shot is 1.5 oz."
-                    },
-                    {
-                        id: 2,
-                        question: "Which glass should be used for a Manhattan cocktail?",
-                        options: [
-                            { text: "Highball glass", correct: false },
-                            { text: "Martini glass", correct: true },
-                            { text: "Rocks glass", correct: false },
-                            { text: "Shot glass", correct: false }
-                        ],
-                        feedback: "A Manhattan is typically served in a Martini glass."
-                    },
-                    {
-                        id: 3,
-                        question: "What is the correct procedure for checking ID?",
-                        options: [
-                            { text: "Check only if they look under 30", correct: false },
-                            { text: "Check every customer who appears under 40", correct: true },
-                            { text: "Check only on weekends", correct: false },
-                            { text: "Never check regular customers", correct: false }
-                        ],
-                        feedback: "Always check ID for customers who appear under 40."
-                    },
-                    {
-                        id: 4,
-                        question: "Which of these is NOT a sign of intoxication?",
-                        options: [
-                            { text: "Slurred speech", correct: false },
-                            { text: "Buying drinks for others", correct: true },
-                            { text: "Spilling drinks", correct: false },
-                            { text: "Being overly friendly", correct: false }
-                        ],
-                        feedback: "Buying drinks for others is not necessarily a sign of intoxication."
-                    }
-                ];
-
-                function initializeTest() {
-                    const testSection = document.getElementById('tests');
-                    const testNavItem = document.getElementById('tests-nav-item');
-
-                    if (!ENABLE_TESTS) {
-                        // Hide test section and nav item if disabled
-                        if (testSection) testSection.style.display = 'none';
-                        if (testNavItem) testNavItem.style.display = 'none';
-                        return;
-                    } else {
-                        // Show test section and nav item if enabled
-                        if (testSection) testSection.style.display = 'block';
-                        if (testNavItem) testNavItem.style.display = 'list-item';
-
-                        // Generate test questions
-                        const test1Questions = document.getElementById('test1-questions');
-                        if (test1Questions) {
-                            test1Questions.innerHTML = '';
-
-                            testQuestions.forEach((q, index) => {
-                                const questionElement = document.createElement('div');
-                                questionElement.className = 'test-question';
-                                questionElement.innerHTML = `
-                            <p><strong>${index + 1}. ${q.question}</strong></p>
-                            ${q.options.map((opt, i) => `
-                                <label>
-                                    <input type="radio" name="q${q.id}" value="${i}">
-                                    ${opt.text}
-                                </label><br>
-                            `).join('')}
-                            <div class="test-feedback" id="feedback-${q.id}" style="display: none;"></div>
-                        `;
-                                test1Questions.appendChild(questionElement);
-                            });
+                        // Refresh admin data when admin panel is accessed
+                        if (targetId === 'admin-panel' && currentUser && isAdmin(currentUser)) {
+                            setTimeout(refreshAdminData, 100);
                         }
                     }
-                }
 
-                function submitTest(testNumber) {
-                    if (testNumber === 1) {
-                        let score = 0;
-                        const totalQuestions = testQuestions.length;
-
-                        testQuestions.forEach(q => {
-                            const selectedOption = document.querySelector(`input[name="q${q.id}"]:checked`);
-                            const questionElement = document.querySelector(`#test1-questions .test-question:nth-child(${q.id})`);
-                            const feedbackElement = document.getElementById(`feedback-${q.id}`);
-
-                            if (!selectedOption) {
-                                // No answer selected
-                                questionElement.classList.remove('correct', 'incorrect');
-                                feedbackElement.textContent = "Please select an answer.";
-                                feedbackElement.className = 'test-feedback';
-                                feedbackElement.style.display = 'block';
-                                return;
-                            }
-
-                            const selectedIndex = parseInt(selectedOption.value);
-                            const isCorrect = q.options[selectedIndex].correct;
-
-                            if (isCorrect) {
-                                score++;
-                                questionElement.classList.add('correct');
-                                questionElement.classList.remove('incorrect');
-                                feedbackElement.textContent = "Correct! " + q.feedback;
-                                feedbackElement.className = 'test-feedback correct';
-                            } else {
-                                questionElement.classList.add('incorrect');
-                                questionElement.classList.remove('correct');
-                                feedbackElement.textContent = "Incorrect. " + q.feedback;
-                                feedbackElement.className = 'test-feedback incorrect';
-                            }
-
-                            feedbackElement.style.display = 'block';
-                        });
-
-                        // Display results
-                        const percentage = Math.round((score / totalQuestions) * 100);
-                        const resultsElement = document.getElementById('test-results');
-
-                        if (resultsElement) {
-                            resultsElement.innerHTML = `
-                        <div class="test-score ${percentage >= 70 ? 'test-pass' : 'test-fail'}">
-                            Score: ${score}/${totalQuestions} (${percentage}%)
-                        </div>
-                        <p>${percentage >= 70 ?
-                                    'Congratulations! You passed the test.' :
-                                    'Please review the materials and try again.'}
-                        </p>
-                        <p><strong>Your test results have been recorded and are visible to management.</strong></p>
-                        <button class="btn" onclick="resetTest(1)" style="margin-top: 10px;">
-                            Retake Test
-                        </button>
-                    `;
-                        }
-
-                        // Save test results to user database
-                        if (currentUser) {
-                            const users = getUserDatabase();
-                            const user = users[currentUser.email];
-
-                            if (user) {
-                                if (!user.testResults) user.testResults = {};
-                                user.testResults[`test${testNumber}`] = {
-                                    score: score,
-                                    total: totalQuestions,
-                                    percentage: percentage,
-                                    passed: percentage >= 70,
-                                    date: new Date().toISOString(),
-                                    testName: "Bartending Fundamentals"
-                                };
-
-                                saveUserDatabase(users);
-                                showToast('Test results saved successfully!');
-                            }
-                        }
+                    if (targetSection && !targetSection.classList.contains('visited')) {
+                        targetSection.classList.add('visited');
+                        calculateProgress();
                     }
+                });
+            });
+
+            // Setup admin menu based on user role
+            function setupAdminMenu() {
+                const adminNavItem = document.querySelector('[data-target="admin-panel"]');
+                console.log('setupAdminMenu called - currentUser:', currentUser);
+
+                if (currentUser && isAdmin(currentUser)) {
+                    console.log('User is admin, showing menu');
+                    if (adminNavItem) adminNavItem.style.display = 'block';
+                } else {
+                    console.log('User is not admin, hiding menu');
+                    if (adminNavItem) adminNavItem.style.display = 'none';
                 }
+            }
 
-                function resetTest(testNumber) {
-                    if (testNumber === 1) {
-                        // Clear all selections
-                        document.querySelectorAll('#test1-questions input[type="radio"]').forEach(input => {
-                            input.checked = false;
-                        });
+            // FAQ toggle
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', function () {
+                    const faqItem = this.parentElement;
+                    faqItem.classList.toggle('active');
+                });
+            });
 
-                        // Reset question styling
-                        document.querySelectorAll('#test1-questions .test-question').forEach(q => {
-                            q.classList.remove('correct', 'incorrect');
-                        });
+            // Progress tracking
+            const acknowledgementCheckbox = document.getElementById('acknowledgement');
+            const submitBtn = document.getElementById('submit-btn');
 
-                        // Hide feedback
-                        document.querySelectorAll('.test-feedback').forEach(feedback => {
-                            feedback.style.display = 'none';
-                        });
-
-                        // Clear results
-                        const resultsElement = document.getElementById('test-results');
-                        if (resultsElement) {
-                            resultsElement.innerHTML = '<p>No tests submitted yet.</p>';
-                        }
-                    }
-                }
-
-                // ========== EMPLOYEE COUNSELING SYSTEM ==========
-                function initializeCounselingSystem() {
-                    // Populate employee dropdown
-                    const employeeSelect = document.getElementById('counseling-employee');
-                    if (employeeSelect) {
-                        employeeSelect.innerHTML = '<option value="">Select Employee</option>';
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function () {
+                    if (acknowledgementCheckbox && acknowledgementCheckbox.checked) {
+                        if (!currentUser) return;
 
                         const users = getUserDatabase();
-                        Object.values(users).forEach(user => {
-                            if (user.position !== 'Admin') {
-                                const option = document.createElement('option');
-                                option.value = user.email;
-                                option.textContent = `${user.name} (${user.position})`;
-                                employeeSelect.appendChild(option);
-                            }
-                        });
-                    }
+                        const user = users[currentUser.email];
 
-                    // Load existing counseling records
-                    loadCounselingRecords();
-                }
+                        user.acknowledged = true;
+                        user.acknowledgementDate = new Date().toISOString();
+                        user.progress = 100;
 
-                function loadCounselingRecords() {
-                    const recordsContainer = document.getElementById('counseling-records');
-                    if (!recordsContainer) return;
+                        saveUserDatabase(users);
 
-                    const counselings = JSON.parse(localStorage.getItem('decadesCounselings')) || [];
+                        const progressFill = document.getElementById('progress-fill');
+                        const progressText = document.getElementById('progress-text');
 
-                    if (counselings.length === 0) {
-                        recordsContainer.innerHTML = '<h4>Previous Records</h4><p>No counseling records found.</p>';
-                        return;
-                    }
+                        if (progressFill) progressFill.style.width = '100%';
+                        if (progressText) progressText.textContent = '100% Complete';
 
-                    let html = '<h4>Previous Records</h4>';
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Acknowledgement Submitted';
+                        submitBtn.style.backgroundColor = '#a0aec0';
 
-                    counselings.forEach((record, index) => {
-                        const date = new Date(record.date);
-                        const typeClass = record.type === 'verbal' ? 'counseling-warning' :
-                            record.type === 'written' ? 'counseling-writeup' : '';
-
-                        html += `
-                    <div class="counseling-record ${typeClass}">
-                        <div class="counseling-date">
-                            ${date.toLocaleDateString()} - ${record.employeeName}
-                            <span class="counseling-type" style="background: ${getCounselingColor(record.type)}; color: white;">
-                                ${record.type.charAt(0).toUpperCase() + record.type.slice(1)}
-                            </span>
-                        </div>
-                        <p><strong>Reason:</strong> ${record.reason}</p>
-                        <p><strong>Action Plan:</strong> ${record.action}</p>
-                        <button class="btn-logout" onclick="deleteCounselingRecord(${index})" style="margin-top: 10px;">Delete Record</button>
-                    </div>
-                `;
-                    });
-
-                    recordsContainer.innerHTML = html;
-                }
-
-                function getCounselingColor(type) {
-                    switch (type) {
-                        case 'verbal': return '#ffc107';
-                        case 'written': return '#fd7e14';
-                        case 'suspension': return '#dc3545';
-                        case 'termination': return '#6c757d';
-                        default: return '#6c757d';
-                    }
-                }
-
-                function saveCounselingRecord() {
-                    const employeeEmail = document.getElementById('counseling-employee').value;
-                    const type = document.getElementById('counseling-type').value;
-                    const date = document.getElementById('counseling-date').value;
-                    const reason = document.getElementById('counseling-reason').value;
-                    const action = document.getElementById('counseling-action').value;
-
-                    if (!employeeEmail || !date || !reason) {
-                        alert('Please fill in all required fields.');
-                        return;
-                    }
-
-                    // Get employee name
-                    const users = getUserDatabase();
-                    const employee = users[employeeEmail];
-                    if (!employee) {
-                        alert('Employee not found.');
-                        return;
-                    }
-
-                    const counselings = JSON.parse(localStorage.getItem('decadesCounselings')) || [];
-
-                    counselings.push({
-                        employeeEmail: employeeEmail,
-                        employeeName: employee.name,
-                        type: type,
-                        date: date,
-                        reason: reason,
-                        action: action,
-                        recordedBy: currentUser.name,
-                        recordedDate: new Date().toISOString()
-                    });
-
-                    localStorage.setItem('decadesCounselings', JSON.stringify(counselings));
-
-                    // Clear form
-                    document.getElementById('counseling-reason').value = '';
-                    document.getElementById('counseling-action').value = '';
-
-                    // Reload records
-                    loadCounselingRecords();
-
-                    showToast('Counseling record saved successfully.');
-                }
-
-                function deleteCounselingRecord(index) {
-                    if (!confirm('Are you sure you want to delete this counseling record?')) return;
-
-                    const counselings = JSON.parse(localStorage.getItem('decadesCounselings')) || [];
-                    counselings.splice(index, 1);
-                    localStorage.setItem('decadesCounselings', JSON.stringify(counselings));
-
-                    loadCounselingRecords();
-                    showToast('Counseling record deleted.');
-                }
-
-                // ========== SCHEDULE REPORT SYSTEM ==========
-                function uploadSchedule() {
-                    const scheduleHTML = document.getElementById('schedule-html').value;
-
-                    if (!scheduleHTML) {
-                        alert('Please paste HTML content to upload.');
-                        return;
-                    }
-
-                    localStorage.setItem('decadesSchedule', scheduleHTML);
-                    document.getElementById('schedule-html').value = '';
-
-                    displaySchedule();
-                    showToast('Schedule uploaded successfully.');
-                }
-
-                function displaySchedule() {
-                    const schedulePreview = document.getElementById('schedule-preview');
-                    const scheduleHTML = localStorage.getItem('decadesSchedule');
-
-                    if (!scheduleHTML) {
-                        schedulePreview.innerHTML = '<h4>Current Schedule</h4><p>No schedule has been uploaded yet.</p>';
-                        return;
-                    }
-
-                    schedulePreview.innerHTML = `
-                <h4>Current Schedule</h4>
-                <div style="overflow-x: auto;">
-                    ${scheduleHTML}
-                </div>
-                <button class="btn-logout" onclick="clearSchedule()" style="margin-top: 15px;">Clear Schedule</button>
-            `;
-                }
-
-                function clearSchedule() {
-                    if (!confirm('Are you sure you want to clear the current schedule?')) return;
-
-                    localStorage.removeItem('decadesSchedule');
-                    displaySchedule();
-                    showToast('Schedule cleared.');
-                }
-
-                // ========== ADMIN TEST RESULTS ==========
-                function displayAdminTestResults() {
-                    if (!currentUser || !isAdmin(currentUser)) return;
-
-                    const container = document.getElementById('admin-test-results');
-                    if (!container) return;
-
-                    const users = getUserDatabase();
-                    let html = '<h4 style="margin-bottom: 15px;">Employee Test Results</h4>';
-
-                    // Check if any users have test results
-                    const usersWithResults = Object.entries(users).filter(([email, user]) =>
-                        user.testResults && Object.keys(user.testResults).length > 0
-                    );
-
-                    if (usersWithResults.length === 0) {
-                        html += '<p>No test results available.</p>';
-                        container.innerHTML = html;
-                        return;
-                    }
-
-                    html += `
-                <table class="test-results-table">
-                    <thead>
-                        <tr>
-                            <th>Employee</th>
-                            <th>Position</th>
-                            <th>Test</th>
-                            <th>Score</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-                    usersWithResults.forEach(([email, user]) => {
-                        Object.entries(user.testResults).forEach(([testId, result]) => {
-                            const date = new Date(result.date);
-                            const formattedDate = date.toLocaleDateString();
-
-                            html += `
-                        <tr>
-                            <td>${user.name}</td>
-                            <td>${user.position}</td>
-                            <td>${result.testName || testId}</td>
-                            <td>${result.score}/${result.total} (${result.percentage}%)</td>
-                            <td>
-                                <span class="${result.passed ? 'test-pass-badge' : 'test-fail-badge'}">
-                                    ${result.passed ? 'Passed' : 'Failed'}
-                                </span>
-                            </td>
-                            <td>${formattedDate}</td>
-                        </tr>
-                    `;
-                        });
-                    });
-
-                    html += '</tbody></table>';
-                    container.innerHTML = html;
-                }
-
-                // ========== ADMIN NAVIGATION SETUP ==========
-                function setupAdminNavigation() {
-                    const counselingsNavItem = document.getElementById('counselings-nav-item');
-                    const scheduleNavItem = document.getElementById('schedule-nav-item');
-                    const adminNavItem = document.getElementById('admin-nav-item');
-
-                    if (currentUser && isAdmin(currentUser)) {
-                        // Show admin sections
-                        if (counselingsNavItem) counselingsNavItem.style.display = 'list-item';
-                        if (scheduleNavItem) scheduleNavItem.style.display = 'list-item';
-                        if (adminNavItem) adminNavItem.style.display = 'list-item';
-
-                        // Initialize admin systems
-                        initializeCounselingSystem();
-                        displaySchedule();
+                        showToast('Acknowledgement submitted successfully!');
+                        calculateProgress();
                     } else {
-                        // Hide admin sections
-                        if (counselingsNavItem) counselingsNavItem.style.display = 'none';
-                        if (scheduleNavItem) scheduleNavItem.style.display = 'none';
-                        if (adminNavItem) adminNavItem.style.display = 'none';
+                        alert('Please check the acknowledgement box before submitting.');
                     }
+                });
+            }
+
+            // Initialize progress
+            if (document.getElementById('welcome')) {
+                document.getElementById('welcome').classList.add('visited');
+                calculateProgress();
+            }
+
+            // ========== LOGIN/REGISTRATION EVENT LISTENERS ==========
+
+            // Direct barrier login
+            const directLoginBtn = document.getElementById('direct-login');
+            if (directLoginBtn) {
+                directLoginBtn.addEventListener('click', async function () {
+                    const email = document.getElementById('direct-email').value.trim();
+                    const password = document.getElementById('direct-password').value;
+
+                    if (!email) {
+                        alert('Please enter your email');
+                        return;
+                    }
+
+                    try {
+                        const user = await performLogin(email, password);
+
+                        // Update login count
+                        const users = getUserDatabase();
+                        if (users[email]) {
+                            users[email].loginCount = (users[email].loginCount || 0) + 1;
+                            users[email].lastLogin = new Date().toISOString();
+                            saveUserDatabase(users);
+                        }
+
+                        startUserSession({
+                            name: user.name,
+                            role: user.position,
+                            email: user.email,
+                            id: user.email,
+                            progress: user.progress || 0,
+                            acknowledged: user.acknowledged || false,
+                            loginTime: new Date().toISOString()
+                        });
+
+                        document.getElementById('login-barrier').style.display = 'none';
+                        document.querySelector('.container').style.display = 'flex';
+                        document.getElementById('login-section').style.display = 'none';
+                        document.getElementById('user-display').style.display = 'flex';
+                        document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
+                        document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
+
+                        showToast(`Welcome back, ${user.name}!`);
+                        updateProgressDisplay();
+                        setupAdminMenu();
+                        setupAdminNavigation();
+
+                    } catch (error) {
+                        alert(error.message);
+                    }
+                });
+            }
+
+            // Direct barrier register
+            const directRegisterBtn = document.getElementById('direct-register');
+            if (directRegisterBtn) {
+                directRegisterBtn.addEventListener('click', function () {
+                    openRegisterModal();
+                });
+            }
+
+            // Registration form submission
+            const registerSubmitBtn = document.getElementById('register-submit-btn');
+            if (registerSubmitBtn) {
+                registerSubmitBtn.addEventListener('click', async function () {
+                    const name = document.getElementById('register-name').value.trim();
+                    const email = document.getElementById('register-email').value.trim();
+                    const position = document.getElementById('register-position').value;
+                    const code = document.getElementById('register-code').value.trim();
+                    const password = document.getElementById('register-password').value;
+                    const confirmPassword = document.getElementById('register-confirm-password').value;
+
+                    try {
+                        const user = await performRegistration({
+                            name, email, position, code, password, confirmPassword
+                        });
+
+                        startUserSession({
+                            name: user.name,
+                            role: user.position,
+                            email: user.email,
+                            id: user.email,
+                            progress: 0,
+                            acknowledged: false,
+                            loginTime: new Date().toISOString()
+                        });
+
+                        document.getElementById('login-barrier').style.display = 'none';
+                        document.querySelector('.container').style.display = 'flex';
+                        document.getElementById('login-section').style.display = 'none';
+                        document.getElementById('user-display').style.display = 'flex';
+                        document.getElementById('user-display-name').textContent = `${user.name} (${user.position})`;
+                        document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
+                        closeAllModals();
+
+                        document.getElementById('register-name').value = '';
+                        document.getElementById('register-email').value = '';
+                        document.getElementById('register-code').value = '';
+                        document.getElementById('register-password').value = '';
+                        document.getElementById('register-confirm-password').value = '';
+
+                        showToast(`Welcome to Decades Bar, ${user.name}!`);
+                        updateProgressDisplay();
+                        setupAdminMenu();
+                        setupAdminNavigation();
+
+                    } catch (error) {
+                        alert(error.message);
+                    }
+                });
+            }
+
+            // Password strength indicator
+            const registerPassword = document.getElementById('register-password');
+            if (registerPassword) {
+                registerPassword.addEventListener('input', function () {
+                    const password = this.value;
+                    const confirmPassword = document.getElementById('register-confirm-password').value;
+                    const strengthElement = document.getElementById('password-strength');
+
+                    if (!strengthElement) return;
+
+                    if (password.length === 0) {
+                        strengthElement.textContent = '';
+                        strengthElement.style.color = '';
+                        return;
+                    }
+
+                    if (confirmPassword.length > 0) {
+                        if (password !== confirmPassword) {
+                            strengthElement.textContent = '✗ Passwords do not match';
+                            strengthElement.style.color = '#e53e3e';
+                        } else {
+                            const strengthError = validatePasswordStrength(password);
+                            if (strengthError) {
+                                strengthElement.textContent = `✓ Passwords match - but ${strengthError.toLowerCase()}`;
+                                strengthElement.style.color = '#ed8936';
+                            } else {
+                                strengthElement.textContent = '✓ Passwords match and are strong';
+                                strengthElement.style.color = '#38a169';
+                            }
+                        }
+                    } else {
+                        const strengthError = validatePasswordStrength(password);
+                        if (strengthError) {
+                            strengthElement.textContent = strengthError;
+                            strengthElement.style.color = '#e53e3e';
+                        } else {
+                            strengthElement.textContent = '✓ Password strength: Good';
+                            strengthElement.style.color = '#38a169';
+                        }
+                    }
+                });
+            }
+
+            // Password matching indicator
+            const registerConfirmPassword = document.getElementById('register-confirm-password');
+            if (registerConfirmPassword) {
+                registerConfirmPassword.addEventListener('input', function () {
+                    const password = document.getElementById('register-password').value;
+                    const confirmPassword = this.value;
+                    const strengthElement = document.getElementById('password-strength');
+
+                    if (!strengthElement) return;
+
+                    if (confirmPassword.length === 0) {
+                        if (password.length > 0) {
+                            const strengthError = validatePasswordStrength(password);
+                            if (strengthError) {
+                                strengthElement.textContent = strengthError;
+                                strengthElement.style.color = '#e53e3e';
+                            } else {
+                                strengthElement.textContent = '✓ Password strength: Good';
+                                strengthElement.style.color = '#38a169';
+                            }
+                        } else {
+                            strengthElement.textContent = '';
+                        }
+                        return;
+                    }
+
+                    if (password !== confirmPassword) {
+                        strengthElement.textContent = '✗ Passwords do not match';
+                        strengthElement.style.color = '#e53e3e';
+                    } else {
+                        const strengthError = validatePasswordStrength(password);
+                        if (strengthError) {
+                            strengthElement.textContent = `✓ Passwords match - but ${strengthError.toLowerCase()}`;
+                            strengthElement.style.color = '#ed8936';
+                        } else {
+                            strengthElement.textContent = '✓ Passwords match and are strong';
+                            strengthElement.style.color = '#38a169';
+                        }
+                    }
+                });
+            }
+
+            // Position validation when position changes
+            const registerPosition = document.getElementById('register-position');
+            if (registerPosition) {
+                registerPosition.addEventListener('change', function () {
+                    const position = this.value;
+                    const codeInput = document.getElementById('register-code');
+                    const adminPositions = ['Admin'];
+
+                    if (adminPositions.includes(position)) {
+                        // Show warning for admin positions
+                        codeInput.placeholder = "MANAGER2025 or DECADESADMIN required";
+                        codeInput.style.borderColor = '#d4af37';
+                        codeInput.style.backgroundColor = '#fffaf0';
+                    } else {
+                        // Reset for regular positions
+                        codeInput.placeholder = "Enter registration code provided by manager";
+                        codeInput.style.borderColor = '';
+                        codeInput.style.backgroundColor = '';
+                    }
+                });
+            }
+
+            // Code validation with position matching
+            const registerCode = document.getElementById('register-code');
+            if (registerCode) {
+                registerCode.addEventListener('input', function () {
+                    const code = this.value.trim();
+                    const position = document.getElementById('register-position').value;
+                    const adminPositions = ['Admin'];
+
+                    if (code.length > 0) {
+                        if (adminPositions.includes(position)) {
+                            const adminCodes = ['MANAGER2025', 'DECADESADMIN'];
+                            if (!adminCodes.includes(code)) {
+                                this.style.borderColor = '#e53e3e';
+                                this.title = 'Admin positions require MANAGER2025 or DECADESADMIN codes';
+                            } else {
+                                this.style.borderColor = '#38a169';
+                                this.title = 'Valid admin code';
+                            }
+                        } else {
+                            // Regular position code validation
+                            if (!APPROVED_CODES.includes(code)) {
+                                this.style.borderColor = '#e53e3e';
+                                this.title = 'Invalid registration code';
+                            } else {
+                                this.style.borderColor = '#38a169';
+                                this.title = 'Valid registration code';
+                            }
+                        }
+                    } else {
+                        this.style.borderColor = '';
+                        this.title = '';
+                    }
+                });
+            }
+
+            // Modal controls
+            document.querySelectorAll('.close-modal, .btn-secondary').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    closeAllModals();
+                });
+            });
+
+            window.addEventListener('click', function (event) {
+                if (event.target.classList.contains('modal')) {
+                    closeAllModals();
                 }
+            });
 
-                // ========== INITIALIZATION ==========
-                document.addEventListener('DOMContentLoaded', function () {
+            // Logout functionality
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function () {
+                    endUserSession();
 
-                     // Initialize tests
-                    initializeTest();
+                    // Clear all login/registration forms
+                    document.getElementById('direct-email').value = '';
+                    document.getElementById('direct-password').value = '';
+                    document.getElementById('register-name').value = '';
+                    document.getElementById('register-email').value = '';
+                    document.getElementById('register-position').selectedIndex = 0;
+                    document.getElementById('register-code').value = '';
+                    document.getElementById('register-password').value = '';
+                    document.getElementById('register-confirm-password').value = '';
+                    const strengthElement = document.getElementById('password-strength');
+                    if (strengthElement) strengthElement.textContent = '';
 
-                    // Setup admin navigation based on user role
+                    // Reset UI
+                    document.getElementById('login-barrier').style.display = 'flex';
+                    document.querySelector('.container').style.display = 'none';
+                    document.getElementById('login-section').style.display = 'block';
+                    document.getElementById('user-display').style.display = 'none';
+
+                    setupAdminMenu();
                     setupAdminNavigation();
 
-                    // Add navigation event listeners for new sections
-                    document.querySelector('[data-target="employee-counselings"]')?.addEventListener('click', function () {
-                        // Ensure only admins can access
-                        if (!currentUser || !isAdmin(currentUser)) {
-                            alert('Admin access required');
-                            return;
-                        }
-                    });
+                    showToast('Logged out successfully');
 
-                    // Initialize calendar
-                    generateCalendar(currentMonth, currentYear);
-
-                    // Add event listeners for calendar navigation
-                    document.getElementById('prev-month')?.addEventListener('click', () => changeMonth(-1));
-                    document.getElementById('next-month')?.addEventListener('click', () => changeMonth(1));
-
-                    // Add test results to admin panel when it's accessed
-                    document.querySelector('[data-target="admin-panel"]')?.addEventListener('click', function () {
-                        setTimeout(() => {
-                            if (currentUser && isAdmin(currentUser)) {
-                                displayAdminTestResults();
-                            }
-                        }, 100);
-                    });
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
                 });
+            }
 
-    });
+            // Check for existing session
+            const validSession = validateSession();
+            if (validSession) {
+                currentUser = validSession;
+                document.getElementById('login-barrier').style.display = 'none';
+                document.querySelector('.container').style.display = 'flex';
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('user-display').style.display = 'flex';
+                document.getElementById('user-display-name').textContent = `${validSession.name} (${validSession.role})`;
+                document.getElementById('user-avatar').textContent = validSession.name.charAt(0).toUpperCase();
+                updateProgressDisplay();
+
+                setupAdminMenu();
+                setupAdminNavigation();
+            }
+
+            // Auto-logout after session timeout
+            setInterval(() => {
+                if (currentUser && !validateSession()) {
+                    alert('Your session has expired. Please log in again.');
+                    endUserSession();
+                    location.reload();
+                }
+            }, 60000);
+        });
     </script>
 </body>
 </html>
