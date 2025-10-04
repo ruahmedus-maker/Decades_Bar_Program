@@ -1065,7 +1065,7 @@
             <ul class="nav-links">
                 <li class="active" data-target="welcome"><a href="#"><i class="fas fa-home"></i> Welcome</a></li>
                 <li data-target="training"><a href="#"><i class="fas fa-graduation-cap"></i> Training Materials</a></li>
-                <li data-target="tests" id="tests-nav-item" class="tests-disabled"><a href="#"><i class="fas fa-question-circle"></i>
+                <li data-target="tests" id="tests-nav-item" style="display: none;"><a href="#"><i class="fas fa-question-circle"></i>
                         Training Tests</a></li>
                 <li data-target="procedures"><a href="#"><i class="fas fa-clipboard-list"></i> Standard Procedures</a></li>
                 <li data-target="aloha-pos"><a href="#"><i class="fas fa-cash-register"></i> Aloha POS</a></li>
@@ -4986,11 +4986,9 @@
                         // Hide test section and nav item if disabled
                         console.log("Tests are disabled - hiding elements");
                         if (testSection) {
-                            testSection.classList.add('tests-disabled');
                             testSection.style.display = 'none';
                         }
                         if (testNavItem) {
-                            testNavItem.classList.add('tests-disabled');
                             testNavItem.style.display = 'none';
                         }
                         return;
@@ -4998,34 +4996,31 @@
                         // Show test section and nav item if enabled
                         console.log("Tests are enabled - showing elements");
                         if (testSection) {
-                            testSection.classList.remove('tests-disabled');
                             testSection.style.display = 'block';
+                            // Generate test questions
+                            const test1Questions = document.getElementById('test1-questions');
+                            if (test1Questions) {
+                                test1Questions.innerHTML = '';
+
+                                testQuestions.forEach((q, index) => {
+                                    const questionElement = document.createElement('div');
+                                    questionElement.className = 'test-question';
+                                    questionElement.innerHTML = `
+                                <p><strong>${index + 1}. ${q.question}</strong></p>
+                                ${q.options.map((opt, i) => `
+                                    <label>
+                                        <input type="radio" name="q${q.id}" value="${i}">
+                                        ${opt.text}
+                                    </label><br>
+                                `).join('')}
+                                <div class="test-feedback" id="feedback-${q.id}" style="display: none;"></div>
+                            `;
+                                    test1Questions.appendChild(questionElement);
+                                });
+                            }
                         }
                         if (testNavItem) {
-                            testNavItem.classList.remove('tests-disabled');
                             testNavItem.style.display = 'list-item';
-                        }
-
-                        // Generate test questions
-                        const test1Questions = document.getElementById('test1-questions');
-                        if (test1Questions) {
-                            test1Questions.innerHTML = '';
-
-                            testQuestions.forEach((q, index) => {
-                                const questionElement = document.createElement('div');
-                                questionElement.className = 'test-question';
-                                questionElement.innerHTML = `
-                            <p><strong>${index + 1}. ${q.question}</strong></p>
-                            ${q.options.map((opt, i) => `
-                                <label>
-                                    <input type="radio" name="q${q.id}" value="${i}">
-                                    ${opt.text}
-                                </label><br>
-                            `).join('')}
-                            <div class="test-feedback" id="feedback-${q.id}" style="display: none;"></div>
-                        `;
-                                test1Questions.appendChild(questionElement);
-                            });
                         }
                     }
                 }
