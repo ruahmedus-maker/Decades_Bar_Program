@@ -1019,6 +1019,73 @@
         #tests-nav-item:not(.tests-disabled) {
             display: list-item;
         }
+
+        /* Employee Counseling Section */
+        .counseling-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .counseling-record {
+            background: #f8f9fa;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        
+        .counseling-date {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .counseling-type {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        
+        .counseling-warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        
+        .counseling-writeup {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        
+        /* Schedule Report Section */
+        .schedule-upload {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .schedule-preview {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            min-height: 200px;
+        }
+        
+        /* Test Section Fix */
+        #tests {
+            display: none; /* Start hidden, will be shown by JS if enabled */
+        }
+        
+        #tests-nav-item {
+            display: none; /* Start hidden, will be shown by JS if enabled */
+        }
+
     </style>
 </head>
 <body>
@@ -1082,6 +1149,16 @@
                 <li data-target="admin-panel"><a href="#"><i class="fas fa-user-cog"></i> Admin Panel</a></li>
                 <li data-target="faq"><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
                 <li data-target="resources"><a href="#"><i class="fas fa-book"></i> Additional Resources</a></li>
+                <li data-target="employee-counselings" id="counselings-nav-item" style="display: none;"><a href="#"><i
+                            class="fas fa-clipboard-check"></i> Employee Counselings</a></li>
+                <li data-target="schedule-report" id="schedule-nav-item" style="display: none;"><a href="#"><i
+                            class="fas fa-calendar-week"></i> Schedule Report</a></li>
+                
+                <li data-target="admin-panel" id="admin-nav-item" style="display: none;"><a href="#"><i class="fas fa-user-cog"></i>
+                        Admin Panel</a></li>
+                <li data-target="faq"><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                <li data-target="resources"><a href="#"><i class="fas fa-book"></i> Additional Resources</a></li>
+                </ul>
                 
             </ul>
         </div>
@@ -1222,121 +1299,11 @@
                     </div>
                     <div class="card-body">
                         <div id="test1-questions">
-                            <!-- Question 1 -->
-                            <div class="test-question"
-                                style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
-                                <p><strong>1. What is the standard pour for a shot of liquor?</strong></p>
-                                <label><input type="radio" name="q1" value="a"> 1 oz</label><br>
-                                <label><input type="radio" name="q1" value="b"> 1.5 oz</label><br>
-                                <label><input type="radio" name="q1" value="c"> 2 oz</label><br>
-                                <label><input type="radio" name="q1" value="d"> 2.5 oz</label>
-                            </div>
-            
-                            <!-- Question 2 -->
-                            <div class="test-question"
-                                style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
-                                <p><strong>2. Which glass should be used for a Manhattan cocktail?</strong></p>
-                                <label><input type="radio" name="q2" value="a"> Highball glass</label><br>
-                                <label><input type="radio" name="q2" value="b"> Martini glass</label><br>
-                                <label><input type="radio" name="q2" value="c"> Rocks glass</label><br>
-                                <label><input type="radio" name="q2" value="d"> Shot glass</label>
-                            </div>
-            
-                            <!-- Question 3 -->
-                            <div class="test-question"
-                                style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
-                                <p><strong>3. What is the correct procedure for checking ID?</strong></p>
-                                <label><input type="radio" name="q3" value="a"> Check only if they look under 30</label><br>
-                                <label><input type="radio" name="q3" value="b"> Check every customer who appears under
-                                    40</label><br>
-                                <label><input type="radio" name="q3" value="c"> Check only on weekends</label><br>
-                                <label><input type="radio" name="q3" value="d"> Never check regular customers</label>
-                            </div>
-            
-                            <!-- Question 4 -->
-                            <div class="test-question" style="margin-bottom: 20px;">
-                                <p><strong>4. Which of these is NOT a sign of intoxication?</strong></p>
-                                <label><input type="radio" name="q4" value="a"> Slurred speech</label><br>
-                                <label><input type="radio" name="q4" value="b"> Buying drinks for others</label><br>
-                                <label><input type="radio" name="q4" value="c"> Spilling drinks</label><br>
-                                <label><input type="radio" name="q4" value="d"> Being overly friendly</label>
-                            </div>
+                            <!-- Questions will be generated by JavaScript -->
                         </div>
             
                         <button class="btn" onclick="submitTest(1)" style="margin-top: 15px;">
                             Submit Test 1
-                        </button>
-                    </div>
-                </div>
-            
-                <!-- Test 2: Cocktail Knowledge -->
-                <div class="card" style="margin-bottom: 25px;">
-                    <div class="card-header">
-                        <h4>🍸 Test 2: Cocktail Recipes</h4>
-                    </div>
-                    <div class="card-body">
-                        <div id="test2-questions">
-                            <!-- Question 1 -->
-                            <div class="test-question"
-                                style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
-                                <p><strong>1. What are the main ingredients in a Long Island Iced Tea?</strong></p>
-                                <label><input type="checkbox" name="q1" value="a"> Vodka</label><br>
-                                <label><input type="checkbox" name="q1" value="b"> Gin</label><br>
-                                <label><input type="checkbox" name="q1" value="c"> Rum</label><br>
-                                <label><input type="checkbox" name="q1" value="d"> Tequila</label><br>
-                                <label><input type="checkbox" name="q1" value="e"> Triple Sec</label><br>
-                                <label><input type="checkbox" name="q1" value="f"> Sour Mix</label><br>
-                                <label><input type="checkbox" name="q1" value="g"> Cola</label>
-                            </div>
-            
-                            <!-- Question 2 -->
-                            <div class="test-question" style="margin-bottom: 20px;">
-                                <p><strong>2. Match the cocktails with their primary spirits:</strong></p>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div>
-                                        <p><strong>Cocktails:</strong></p>
-                                        <div>Old Fashioned</div>
-                                        <div>Margarita</div>
-                                        <div>Mojito</div>
-                                        <div>Martini</div>
-                                    </div>
-                                    <div>
-                                        <p><strong>Spirits:</strong></p>
-                                        <select name="q2_oldfashioned" style="width: 100%; margin-bottom: 5px;">
-                                            <option value="">Select spirit</option>
-                                            <option value="whiskey">Whiskey</option>
-                                            <option value="tequila">Tequila</option>
-                                            <option value="rum">Rum</option>
-                                            <option value="gin">Gin</option>
-                                        </select>
-                                        <select name="q2_margarita" style="width: 100%; margin-bottom: 5px;">
-                                            <option value="">Select spirit</option>
-                                            <option value="whiskey">Whiskey</option>
-                                            <option value="tequila">Tequila</option>
-                                            <option value="rum">Rum</option>
-                                            <option value="gin">Gin</option>
-                                        </select>
-                                        <select name="q2_mojito" style="width: 100%; margin-bottom: 5px;">
-                                            <option value="">Select spirit</option>
-                                            <option value="whiskey">Whiskey</option>
-                                            <option value="tequila">Tequila</option>
-                                            <option value="rum">Rum</option>
-                                            <option value="gin">Gin</option>
-                                        </select>
-                                        <select name="q2_martini" style="width: 100%; margin-bottom: 5px;">
-                                            <option value="">Select spirit</option>
-                                            <option value="whiskey">Whiskey</option>
-                                            <option value="tequila">Tequila</option>
-                                            <option value="rum">Rum</option>
-                                            <option value="gin">Gin</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-            
-                        <button class="btn" onclick="submitTest(2)" style="margin-top: 15px;">
-                            Submit Test 2
                         </button>
                     </div>
                 </div>
@@ -1353,6 +1320,78 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- New Employee Counselings Section (Admin Only) -->
+            <div class="section" id="employee-counselings" style="display: none;">
+                <div class="section-header">
+                    <h3>Employee Counselings & Write-ups</h3>
+                    <span class="badge">Admin Only</span>
+                </div>
+            
+                <div class="counseling-form">
+                    <h4>New Counseling Record</h4>
+                    <div class="form-group">
+                        <label for="counseling-employee">Employee</label>
+                        <select id="counseling-employee" class="form-control">
+                            <option value="">Select Employee</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="counseling-type">Type</label>
+                        <select id="counseling-type" class="form-control">
+                            <option value="verbal">Verbal Warning</option>
+                            <option value="written">Written Warning</option>
+                            <option value="suspension">Suspension</option>
+                            <option value="termination">Termination Notice</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="counseling-date">Date</label>
+                        <input type="date" id="counseling-date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="counseling-reason">Reason/Description</label>
+                        <textarea id="counseling-reason" class="form-control" rows="4"
+                            placeholder="Describe the incident and counseling details..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="counseling-action">Action Plan/Resolution</label>
+                        <textarea id="counseling-action" class="form-control" rows="3"
+                            placeholder="Describe the expected corrective actions..."></textarea>
+                    </div>
+                    <button class="btn" onclick="saveCounselingRecord()">Save Record</button>
+                </div>
+            
+                <div id="counseling-records">
+                    <h4>Previous Records</h4>
+                    <p>No counseling records found.</p>
+                </div>
+            </div>
+            
+            <!-- New Schedule Report Section (Admin Only) -->
+            <div class="section" id="schedule-report" style="display: none;">
+                <div class="section-header">
+                    <h3>Schedule Report</h3>
+                    <span class="badge">Admin Only</span>
+                </div>
+            
+                <div class="schedule-upload">
+                    <h4>Upload Schedule Report</h4>
+                    <p>Paste your HTML schedule report from Google Sheets below:</p>
+                    <div class="form-group">
+                        <textarea id="schedule-html" class="form-control" rows="10"
+                            placeholder="Paste HTML content here..."></textarea>
+                    </div>
+                    <button class="btn" onclick="uploadSchedule()">Upload Schedule</button>
+                </div>
+            
+                <div class="schedule-preview" id="schedule-preview">
+                    <h4>Current Schedule</h4>
+                    <p>No schedule has been uploaded yet.</p>
+                </div>
+            </div>
+            
+            
             
             <!-- Standard Procedures Section -->
             <div class="section" id="procedures">
@@ -3672,7 +3711,7 @@
             <div class="section" id="admin-panel">
                 <div class="section-header">
                     <h3>Admin Dashboard</h3>
-                    <span class="badge">Managers Only</span>
+                    <span class="badge">Admin Only</span>
                 </div>
                 <div class="card" style="margin-top: 20px;">
                     <div class="card-header">
@@ -4978,49 +5017,36 @@
                     const testSection = document.getElementById('tests');
                     const testNavItem = document.getElementById('tests-nav-item');
 
-                    console.log("Initializing tests. ENABLE_TESTS:", ENABLE_TESTS);
-                    console.log("Test section:", testSection);
-                    console.log("Test nav item:", testNavItem);
-
                     if (!ENABLE_TESTS) {
                         // Hide test section and nav item if disabled
-                        console.log("Tests are disabled - hiding elements");
-                        if (testSection) {
-                            testSection.style.display = 'none';
-                        }
-                        if (testNavItem) {
-                            testNavItem.style.display = 'none';
-                        }
+                        if (testSection) testSection.style.display = 'none';
+                        if (testNavItem) testNavItem.style.display = 'none';
                         return;
                     } else {
                         // Show test section and nav item if enabled
-                        console.log("Tests are enabled - showing elements");
-                        if (testSection) {
-                            testSection.style.display = 'block';
-                            // Generate test questions
-                            const test1Questions = document.getElementById('test1-questions');
-                            if (test1Questions) {
-                                test1Questions.innerHTML = '';
+                        if (testSection) testSection.style.display = 'block';
+                        if (testNavItem) testNavItem.style.display = 'list-item';
 
-                                testQuestions.forEach((q, index) => {
-                                    const questionElement = document.createElement('div');
-                                    questionElement.className = 'test-question';
-                                    questionElement.innerHTML = `
-                                <p><strong>${index + 1}. ${q.question}</strong></p>
-                                ${q.options.map((opt, i) => `
-                                    <label>
-                                        <input type="radio" name="q${q.id}" value="${i}">
-                                        ${opt.text}
-                                    </label><br>
-                                `).join('')}
-                                <div class="test-feedback" id="feedback-${q.id}" style="display: none;"></div>
-                            `;
-                                    test1Questions.appendChild(questionElement);
-                                });
-                            }
-                        }
-                        if (testNavItem) {
-                            testNavItem.style.display = 'list-item';
+                        // Generate test questions
+                        const test1Questions = document.getElementById('test1-questions');
+                        if (test1Questions) {
+                            test1Questions.innerHTML = '';
+
+                            testQuestions.forEach((q, index) => {
+                                const questionElement = document.createElement('div');
+                                questionElement.className = 'test-question';
+                                questionElement.innerHTML = `
+                            <p><strong>${index + 1}. ${q.question}</strong></p>
+                            ${q.options.map((opt, i) => `
+                                <label>
+                                    <input type="radio" name="q${q.id}" value="${i}">
+                                    ${opt.text}
+                                </label><br>
+                            `).join('')}
+                            <div class="test-feedback" id="feedback-${q.id}" style="display: none;"></div>
+                        `;
+                                test1Questions.appendChild(questionElement);
+                            });
                         }
                     }
                 }
@@ -5131,6 +5157,172 @@
                     }
                 }
 
+                // ========== EMPLOYEE COUNSELING SYSTEM ==========
+                function initializeCounselingSystem() {
+                    // Populate employee dropdown
+                    const employeeSelect = document.getElementById('counseling-employee');
+                    if (employeeSelect) {
+                        employeeSelect.innerHTML = '<option value="">Select Employee</option>';
+
+                        const users = getUserDatabase();
+                        Object.values(users).forEach(user => {
+                            if (user.position !== 'Admin') {
+                                const option = document.createElement('option');
+                                option.value = user.email;
+                                option.textContent = `${user.name} (${user.position})`;
+                                employeeSelect.appendChild(option);
+                            }
+                        });
+                    }
+
+                    // Load existing counseling records
+                    loadCounselingRecords();
+                }
+
+                function loadCounselingRecords() {
+                    const recordsContainer = document.getElementById('counseling-records');
+                    if (!recordsContainer) return;
+
+                    const counselings = JSON.parse(localStorage.getItem('decadesCounselings')) || [];
+
+                    if (counselings.length === 0) {
+                        recordsContainer.innerHTML = '<h4>Previous Records</h4><p>No counseling records found.</p>';
+                        return;
+                    }
+
+                    let html = '<h4>Previous Records</h4>';
+
+                    counselings.forEach((record, index) => {
+                        const date = new Date(record.date);
+                        const typeClass = record.type === 'verbal' ? 'counseling-warning' :
+                            record.type === 'written' ? 'counseling-writeup' : '';
+
+                        html += `
+                    <div class="counseling-record ${typeClass}">
+                        <div class="counseling-date">
+                            ${date.toLocaleDateString()} - ${record.employeeName}
+                            <span class="counseling-type" style="background: ${getCounselingColor(record.type)}; color: white;">
+                                ${record.type.charAt(0).toUpperCase() + record.type.slice(1)}
+                            </span>
+                        </div>
+                        <p><strong>Reason:</strong> ${record.reason}</p>
+                        <p><strong>Action Plan:</strong> ${record.action}</p>
+                        <button class="btn-logout" onclick="deleteCounselingRecord(${index})" style="margin-top: 10px;">Delete Record</button>
+                    </div>
+                `;
+                    });
+
+                    recordsContainer.innerHTML = html;
+                }
+
+                function getCounselingColor(type) {
+                    switch (type) {
+                        case 'verbal': return '#ffc107';
+                        case 'written': return '#fd7e14';
+                        case 'suspension': return '#dc3545';
+                        case 'termination': return '#6c757d';
+                        default: return '#6c757d';
+                    }
+                }
+
+                function saveCounselingRecord() {
+                    const employeeEmail = document.getElementById('counseling-employee').value;
+                    const type = document.getElementById('counseling-type').value;
+                    const date = document.getElementById('counseling-date').value;
+                    const reason = document.getElementById('counseling-reason').value;
+                    const action = document.getElementById('counseling-action').value;
+
+                    if (!employeeEmail || !date || !reason) {
+                        alert('Please fill in all required fields.');
+                        return;
+                    }
+
+                    // Get employee name
+                    const users = getUserDatabase();
+                    const employee = users[employeeEmail];
+                    if (!employee) {
+                        alert('Employee not found.');
+                        return;
+                    }
+
+                    const counselings = JSON.parse(localStorage.getItem('decadesCounselings')) || [];
+
+                    counselings.push({
+                        employeeEmail: employeeEmail,
+                        employeeName: employee.name,
+                        type: type,
+                        date: date,
+                        reason: reason,
+                        action: action,
+                        recordedBy: currentUser.name,
+                        recordedDate: new Date().toISOString()
+                    });
+
+                    localStorage.setItem('decadesCounselings', JSON.stringify(counselings));
+
+                    // Clear form
+                    document.getElementById('counseling-reason').value = '';
+                    document.getElementById('counseling-action').value = '';
+
+                    // Reload records
+                    loadCounselingRecords();
+
+                    showToast('Counseling record saved successfully.');
+                }
+
+                function deleteCounselingRecord(index) {
+                    if (!confirm('Are you sure you want to delete this counseling record?')) return;
+
+                    const counselings = JSON.parse(localStorage.getItem('decadesCounselings')) || [];
+                    counselings.splice(index, 1);
+                    localStorage.setItem('decadesCounselings', JSON.stringify(counselings));
+
+                    loadCounselingRecords();
+                    showToast('Counseling record deleted.');
+                }
+
+                // ========== SCHEDULE REPORT SYSTEM ==========
+                function uploadSchedule() {
+                    const scheduleHTML = document.getElementById('schedule-html').value;
+
+                    if (!scheduleHTML) {
+                        alert('Please paste HTML content to upload.');
+                        return;
+                    }
+
+                    localStorage.setItem('decadesSchedule', scheduleHTML);
+                    document.getElementById('schedule-html').value = '';
+
+                    displaySchedule();
+                    showToast('Schedule uploaded successfully.');
+                }
+
+                function displaySchedule() {
+                    const schedulePreview = document.getElementById('schedule-preview');
+                    const scheduleHTML = localStorage.getItem('decadesSchedule');
+
+                    if (!scheduleHTML) {
+                        schedulePreview.innerHTML = '<h4>Current Schedule</h4><p>No schedule has been uploaded yet.</p>';
+                        return;
+                    }
+
+                    schedulePreview.innerHTML = `
+                <h4>Current Schedule</h4>
+                <div style="overflow-x: auto;">
+                    ${scheduleHTML}
+                </div>
+                <button class="btn-logout" onclick="clearSchedule()" style="margin-top: 15px;">Clear Schedule</button>
+            `;
+                }
+
+                function clearSchedule() {
+                    if (!confirm('Are you sure you want to clear the current schedule?')) return;
+
+                    localStorage.removeItem('decadesSchedule');
+                    displaySchedule();
+                    showToast('Schedule cleared.');
+                }
+
                 // ========== ADMIN TEST RESULTS ==========
                 function displayAdminTestResults() {
                     if (!currentUser || !isAdmin(currentUser)) return;
@@ -5193,13 +5385,49 @@
                     container.innerHTML = html;
                 }
 
+                // ========== ADMIN NAVIGATION SETUP ==========
+                function setupAdminNavigation() {
+                    const counselingsNavItem = document.getElementById('counselings-nav-item');
+                    const scheduleNavItem = document.getElementById('schedule-nav-item');
+                    const adminNavItem = document.getElementById('admin-nav-item');
+
+                    if (currentUser && isAdmin(currentUser)) {
+                        // Show admin sections
+                        if (counselingsNavItem) counselingsNavItem.style.display = 'list-item';
+                        if (scheduleNavItem) scheduleNavItem.style.display = 'list-item';
+                        if (adminNavItem) adminNavItem.style.display = 'list-item';
+
+                        // Initialize admin systems
+                        initializeCounselingSystem();
+                        displaySchedule();
+                    } else {
+                        // Hide admin sections
+                        if (counselingsNavItem) counselingsNavItem.style.display = 'none';
+                        if (scheduleNavItem) scheduleNavItem.style.display = 'none';
+                        if (adminNavItem) adminNavItem.style.display = 'none';
+                    }
+                }
+
                 // ========== INITIALIZATION ==========
                 document.addEventListener('DOMContentLoaded', function () {
+
+                     // Initialize tests
+                    initializeTest();
+
+                    // Setup admin navigation based on user role
+                    setupAdminNavigation();
+
+                    // Add navigation event listeners for new sections
+                    document.querySelector('[data-target="employee-counselings"]')?.addEventListener('click', function () {
+                        // Ensure only admins can access
+                        if (!currentUser || !isAdmin(currentUser)) {
+                            alert('Admin access required');
+                            return;
+                        }
+                    });
+
                     // Initialize calendar
                     generateCalendar(currentMonth, currentYear);
-
-                    // Initialize tests - this will show/hide based on ENABLE_TESTS
-                    initializeTest();
 
                     // Add event listeners for calendar navigation
                     document.getElementById('prev-month')?.addEventListener('click', () => changeMonth(-1));
