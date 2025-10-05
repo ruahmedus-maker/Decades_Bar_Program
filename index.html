@@ -4326,11 +4326,13 @@
         ];
 
         function initializeTest() {
-            const testSection = document.getElementById('tests');
-            const testNavItem = document.getElementById('tests-nav-item');
-
             console.log('Initializing tests, ENABLE_TESTS:', ENABLE_TESTS);
 
+            // ADD THIS LINE TO FIX THE ISSUE:
+            if (!document.getElementById('test1-questions')) return;
+
+            const testSection = document.getElementById('tests');
+            const testNavItem = document.getElementById('tests-nav-item');
             if (!ENABLE_TESTS) {
                 // Hide test section and nav item if disabled
                 if (testSection) {
