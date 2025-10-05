@@ -3953,7 +3953,7 @@
         ];
 
         // Set this to true to enable tests, false to hide them
-        const ENABLE_TESTS = true;
+        const ENABLE_TESTS = false; // CHANGED TO FALSE
 
         // ========== CORE FUNCTIONS ==========
         function showToast(message) {
@@ -4326,41 +4326,38 @@
         ];
 
         function initializeTest() {
-                console.log('Initializing tests, ENABLE_TESTS:', ENABLE_TESTS);
+            console.log('Initializing tests, ENABLE_TESTS:', ENABLE_TESTS);
 
-                const testSection = document.getElementById('tests');
-                const testNavItem = document.getElementById('tests-nav-item');
+            const testSection = document.getElementById('tests');
+            const testNavItem = document.getElementById('tests-nav-item');
 
-                // CRITICAL FIX: Only proceed if we're on the tests page
-                const test1Questions = document.getElementById('test1-questions');
-                if (!test1Questions) {
-                    console.log('Test questions container not found, skipping test initialization');
-                    return;
+            if (!ENABLE_TESTS) {
+                console.log('Tests are disabled - hiding test section and nav item');
+                // Hide test section and nav item if disabled
+                if (testSection) {
+                    testSection.style.display = 'none';
+                    testSection.classList.add('tests-disabled');
+                }
+                if (testNavItem) {
+                    testNavItem.style.display = 'none';
+                    testNavItem.classList.add('tests-disabled');
+                }
+                return;
+            } else {
+                console.log('Tests are enabled - showing test section and nav item');
+                // Show test section and nav item if enabled
+                if (testSection) {
+                    testSection.style.display = 'block';
+                    testSection.classList.remove('tests-disabled');
+                }
+                if (testNavItem) {
+                    testNavItem.style.display = 'list-item';
+                    testNavItem.classList.remove('tests-disabled');
                 }
 
-                if (!ENABLE_TESTS) {
-                    // Hide test section and nav item if disabled
-                    if (testSection) {
-                        testSection.style.display = 'none';
-                        testSection.classList.add('tests-disabled');
-                    }
-                    if (testNavItem) {
-                        testNavItem.style.display = 'none';
-                        testNavItem.classList.add('tests-disabled');
-                    }
-                    return;
-                } else {
-                    // Show test section and nav item if enabled
-                    if (testSection) {
-                        testSection.style.display = 'block';
-                        testSection.classList.remove('tests-disabled');
-                    }
-                    if (testNavItem) {
-                        testNavItem.style.display = 'list-item';
-                        testNavItem.classList.remove('tests-disabled');
-                    }
-
-                    // Generate test questions ONLY in the correct container
+                // Generate test questions ONLY in the correct container
+                const test1Questions = document.getElementById('test1-questions');
+                if (test1Questions) {
                     console.log('Generating test questions in test1-questions container');
                     test1Questions.innerHTML = '';
 
@@ -4368,19 +4365,20 @@
                         const questionElement = document.createElement('div');
                         questionElement.className = 'test-question';
                         questionElement.innerHTML = `
-                <p><strong>${index + 1}. ${q.question}</strong></p>
-                ${q.options.map((opt, i) => `
-                    <label style="display: block; margin: 5px 0;">
-                        <input type="radio" name="q${q.id}" value="${i}">
-                        ${opt.text}
-                    </label>
-                `).join('')}
-                <div class="test-feedback" id="feedback-${q.id}" style="display: none;"></div>
-            `;
+                    <p><strong>${index + 1}. ${q.question}</strong></p>
+                    ${q.options.map((opt, i) => `
+                        <label style="display: block; margin: 5px 0;">
+                            <input type="radio" name="q${q.id}" value="${i}">
+                            ${opt.text}
+                        </label>
+                    `).join('')}
+                    <div class="test-feedback" id="feedback-${q.id}" style="display: none;"></div>
+                `;
                         test1Questions.appendChild(questionElement);
                     });
                 }
             }
+        }
 
         function submitTest(testNumber) {
             if (testNumber === 1) {
@@ -4436,18 +4434,18 @@
 
                 if (resultsElement) {
                     resultsElement.innerHTML = `
-              <div class="test-score ${percentage >= 70 ? 'test-pass' : 'test-fail'}">
-                Score: ${score}/${totalQuestions} (${percentage}%)
-              </div>
-              <p>${percentage >= 70 ?
+                  <div class="test-score ${percentage >= 70 ? 'test-pass' : 'test-fail'}">
+                    Score: ${score}/${totalQuestions} (${percentage}%)
+                  </div>
+                  <p>${percentage >= 70 ?
                             'Congratulations! You passed the test.' :
                             'Please review the materials and try again.'}
-              </p>
-              <p><strong>Your test results have been recorded and are visible to management.</strong></p>
-              <button class="btn" onclick="resetTest(1)" style="margin-top: 10px;">
-                Retake Test
-              </button>
-            `;
+                  </p>
+                  <p><strong>Your test results have been recorded and are visible to management.</strong></p>
+                  <button class="btn" onclick="resetTest(1)" style="margin-top: 10px;">
+                    Retake Test
+                  </button>
+                `;
                 }
 
                 // Save test results to user database
@@ -4520,15 +4518,15 @@
             const acknowledgedCount = userArray.filter(u => u.acknowledged).length;
 
             const statsHtml = `
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div><strong>Total Users:</strong> ${totalUsers}</div>
-            <div><strong>Active:</strong> ${activeUsers}</div>
-            <div><strong>Blocked:</strong> ${blockedUsers}</div>
-            <div><strong>Completed Training:</strong> ${completedTraining}</div>
-            <div><strong>Submitted Acknowledgements:</strong> ${acknowledgedCount}</div>
-            <div><strong>Completion Rate:</strong> ${totalUsers ? Math.round((completedTraining / totalUsers) * 100) : 0}%</div>
-          </div>
-        `;
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div><strong>Total Users:</strong> ${totalUsers}</div>
+                <div><strong>Active:</strong> ${activeUsers}</div>
+                <div><strong>Blocked:</strong> ${blockedUsers}</div>
+                <div><strong>Completed Training:</strong> ${completedTraining}</div>
+                <div><strong>Submitted Acknowledgements:</strong> ${acknowledgedCount}</div>
+                <div><strong>Completion Rate:</strong> ${totalUsers ? Math.round((completedTraining / totalUsers) * 100) : 0}%</div>
+              </div>
+            `;
 
             const statsElement = document.getElementById('admin-stats');
             if (statsElement) {
@@ -4550,20 +4548,20 @@
             }
 
             let html = `
-          <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-              <thead>
-                <tr style="background: #f8f9fa;">
-                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Name</th>
-                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Email</th>
-                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Position</th>
-                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Progress</th>
-                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Status</th>
-                  <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
+              <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                  <thead>
+                    <tr style="background: #f8f9fa;">
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Name</th>
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Email</th>
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Position</th>
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Progress</th>
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Status</th>
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+            `;
 
             Object.entries(users).forEach(([email, user]) => {
                 const progressColor = user.progress >= 100 ? 'green' :
@@ -4578,22 +4576,22 @@
                     `<button onclick="blockUser('${email}')" style="background: #e53e3e; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8rem;">Block</button>`;
 
                 html += `
-            <tr style="border-bottom: 1px solid #e2e8f0;">
-              <td style="padding: 12px;">${user.name}</td>
-              <td style="padding: 12px;">${email}</td>
-              <td style="padding: 12px;">${user.position}</td>
-              <td style="padding: 12px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <div style="width: 60px; height: 8px; background: #e2e8f0; border-radius: 4px;">
-                    <div style="width: ${user.progress || 0}%; height: 100%; background: ${progressColor}; border-radius: 4px;"></div>
-                  </div>
-                  <span>${user.progress || 0}%</span>
-                </div>
-              </td>
-              <td style="padding: 12px;">${status}</td>
-              <td style="padding: 12px;">${actionButton}</td>
-            </tr>
-          `;
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                  <td style="padding: 12px;">${user.name}</td>
+                  <td style="padding: 12px;">${email}</td>
+                  <td style="padding: 12px;">${user.position}</td>
+                  <td style="padding: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <div style="width: 60px; height: 8px; background: #e2e8f0; border-radius: 4px;">
+                        <div style="width: ${user.progress || 0}%; height: 100%; background: ${progressColor}; border-radius: 4px;"></div>
+                      </div>
+                      <span>${user.progress || 0}%</span>
+                    </div>
+                  </td>
+                  <td style="padding: 12px;">${status}</td>
+                  <td style="padding: 12px;">${actionButton}</td>
+                </tr>
+              `;
             });
 
             html += `</tbody></table></div>`;
@@ -4678,19 +4676,19 @@
             }
 
             html += `
-          <table class="test-results-table">
-            <thead>
-              <tr>
-                <th>Employee</th>
-                <th>Position</th>
-                <th>Test</th>
-                <th>Score</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
+              <table class="test-results-table">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Position</th>
+                    <th>Test</th>
+                    <th>Score</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+            `;
 
             usersWithResults.forEach(([email, user]) => {
                 Object.entries(user.testResults).forEach(([testId, result]) => {
@@ -4698,19 +4696,19 @@
                     const formattedDate = date.toLocaleDateString();
 
                     html += `
-              <tr>
-                <td>${user.name}</td>
-                <td>${user.position}</td>
-                <td>${result.testName || testId}</td>
-                <td>${result.score}/${result.total} (${result.percentage}%)</td>
-                <td>
-                  <span class="${result.passed ? 'test-pass-badge' : 'test-fail-badge'}">
-                    ${result.passed ? 'Passed' : 'Failed'}
-                  </span>
-                </td>
-                <td>${formattedDate}</td>
-              </tr>
-            `;
+                  <tr>
+                    <td>${user.name}</td>
+                    <td>${user.position}</td>
+                    <td>${result.testName || testId}</td>
+                    <td>${result.score}/${result.total} (${result.percentage}%)</td>
+                    <td>
+                      <span class="${result.passed ? 'test-pass-badge' : 'test-fail-badge'}">
+                        ${result.passed ? 'Passed' : 'Failed'}
+                      </span>
+                    </td>
+                    <td>${formattedDate}</td>
+                  </tr>
+                `;
                 });
             });
 
@@ -4759,18 +4757,18 @@
                     record.type === 'written' ? 'counseling-writeup' : '';
 
                 html += `
-            <div class="counseling-record ${typeClass}">
-              <div class="counseling-date">
-                ${date.toLocaleDateString()} - ${record.employeeName}
-                <span class="counseling-type" style="background: ${getCounselingColor(record.type)}; color: white;">
-                  ${record.type.charAt(0).toUpperCase() + record.type.slice(1)}
-                </span>
-              </div>
-              <p><strong>Reason:</strong> ${record.reason}</p>
-              <p><strong>Action Plan:</strong> ${record.action}</p>
-              <button class="btn-logout" onclick="deleteCounselingRecord(${index})" style="margin-top: 10px;">Delete Record</button>
-            </div>
-          `;
+                <div class="counseling-record ${typeClass}">
+                  <div class="counseling-date">
+                    ${date.toLocaleDateString()} - ${record.employeeName}
+                    <span class="counseling-type" style="background: ${getCounselingColor(record.type)}; color: white;">
+                      ${record.type.charAt(0).toUpperCase() + record.type.slice(1)}
+                    </span>
+                  </div>
+                  <p><strong>Reason:</strong> ${record.reason}</p>
+                  <p><strong>Action Plan:</strong> ${record.action}</p>
+                  <button class="btn-logout" onclick="deleteCounselingRecord(${index})" style="margin-top: 10px;">Delete Record</button>
+                </div>
+              `;
             });
 
             recordsContainer.innerHTML = html;
@@ -4868,12 +4866,12 @@
             }
 
             schedulePreview.innerHTML = `
-          <h4>Current Schedule</h4>
-          <div style="overflow-x: auto;">
-            ${scheduleHTML}
-          </div>
-          <button class="btn-logout" onclick="clearSchedule()" style="margin-top: 15px;">Clear Schedule</button>
-        `;
+              <h4>Current Schedule</h4>
+              <div style="overflow-x: auto;">
+                ${scheduleHTML}
+              </div>
+              <button class="btn-logout" onclick="clearSchedule()" style="margin-top: 15px;">Clear Schedule</button>
+            `;
         }
 
         function clearSchedule() {
@@ -4891,17 +4889,29 @@
             const adminNavItem = document.getElementById('admin-nav-item');
 
             console.log('Setting up admin navigation, currentUser:', currentUser);
+            console.log('Is admin:', currentUser && isAdmin(currentUser));
 
             if (currentUser && isAdmin(currentUser)) {
+                console.log('User is admin - showing admin sections');
                 // Show admin sections
-                if (counselingsNavItem) counselingsNavItem.style.display = 'list-item';
-                if (scheduleNavItem) scheduleNavItem.style.display = 'list-item';
-                if (adminNavItem) adminNavItem.style.display = 'list-item';
+                if (counselingsNavItem) {
+                    counselingsNavItem.style.display = 'list-item';
+                    console.log('Showing counselings nav item');
+                }
+                if (scheduleNavItem) {
+                    scheduleNavItem.style.display = 'list-item';
+                    console.log('Showing schedule nav item');
+                }
+                if (adminNavItem) {
+                    adminNavItem.style.display = 'list-item';
+                    console.log('Showing admin nav item');
+                }
 
                 // Initialize admin systems
                 initializeCounselingSystem();
                 displaySchedule();
             } else {
+                console.log('User is not admin - hiding admin sections');
                 // Hide admin sections
                 if (counselingsNavItem) counselingsNavItem.style.display = 'none';
                 if (scheduleNavItem) scheduleNavItem.style.display = 'none';
@@ -4959,9 +4969,9 @@
                 }
 
                 dayElement.innerHTML = `
-            <div>${day}</div>
-            ${cleaningDays.includes(dateStr) ? '<div class="cleaning-indicator">Cleaning</div>' : ''}
-          `;
+                <div>${day}</div>
+                ${cleaningDays.includes(dateStr) ? '<div class="cleaning-indicator">Cleaning</div>' : ''}
+              `;
 
                 // Add click event to toggle cleaning day
                 dayElement.addEventListener('click', () => toggleCleaningDay(year, month, day));
@@ -5049,20 +5059,6 @@
                     }
                 });
             });
-
-            // Setup admin menu based on user role
-            function setupAdminMenu() {
-                const adminNavItem = document.querySelector('[data-target="admin-panel"]');
-                console.log('setupAdminMenu called - currentUser:', currentUser);
-
-                if (currentUser && isAdmin(currentUser)) {
-                    console.log('User is admin, showing menu');
-                    if (adminNavItem) adminNavItem.style.display = 'block';
-                } else {
-                    console.log('User is not admin, hiding menu');
-                    if (adminNavItem) adminNavItem.style.display = 'none';
-                }
-            }
 
             // FAQ toggle
             document.querySelectorAll('.faq-question').forEach(question => {
@@ -5158,7 +5154,6 @@
 
                         showToast(`Welcome back, ${user.name}!`);
                         updateProgressDisplay();
-                        setupAdminMenu();
                         setupAdminNavigation();
 
                     } catch (error) {
@@ -5217,7 +5212,6 @@
 
                         showToast(`Welcome to Decades Bar, ${user.name}!`);
                         updateProgressDisplay();
-                        setupAdminMenu();
                         setupAdminNavigation();
 
                     } catch (error) {
@@ -5405,7 +5399,6 @@
                     document.getElementById('login-section').style.display = 'block';
                     document.getElementById('user-display').style.display = 'none';
 
-                    setupAdminMenu();
                     setupAdminNavigation();
 
                     showToast('Logged out successfully');
@@ -5428,7 +5421,6 @@
                 document.getElementById('user-avatar').textContent = validSession.name.charAt(0).toUpperCase();
                 updateProgressDisplay();
 
-                setupAdminMenu();
                 setupAdminNavigation();
             }
 
