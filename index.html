@@ -3915,7 +3915,6 @@
                             <select id="register-position">
                                 <option value="Bartender">Bartender</option>
                                 <option value="Admin"style="color: #d4af37; font-weight: bold;">Admin ⚠️ (Admin Code Required)</option>
-                                <option value="Manager">Manager</option>
                                 <option value="Trainee">Trainee</option>
                             </select>
                         </div>
@@ -3946,11 +3945,11 @@
         };
 
         const APPROVED_CODES = [
-            "BARSTAFF2025", "MANAGER2025", "DECADESADMIN"
+            "BARSTAFF2025", "DECADESADMIN"
         ];
 
         // Set this to true to enable tests, false to hide them
-        const ENABLE_TESTS = true; // CHANGED TO FALSE
+        const ENABLE_TESTS = false; // CHANGED TO FALSE
 
         // ========== CORE FUNCTIONS ==========
         function showToast(message) {
@@ -4172,84 +4171,78 @@
         }
 
         async function performRegistration(userData) {
-            const { name, email, position, code, password, confirmPassword } = userData;
+                const { name, email, position, code, password, confirmPassword } = userData;
 
-            // Basic validation
-            if (!name || !email || !position || !code || !password || !confirmPassword) {
-                throw new Error('Please fill in all fields');
-            }
-
-            if (password !== confirmPassword) {
-                throw new Error('Passwords do not match');
-            }
-
-            const strengthError = validatePasswordStrength(password);
-            if (strengthError) {
-                throw new Error(strengthError);
-            }
-
-            if (!APPROVED_CODES.includes(code)) {
-                throw new Error('Invalid registration code. Please contact your manager.');
-            }
-
-            // === ADMIN REGISTRATION SAFEGUARDS ===
-            const adminPositions = ['Admin'];
-            const regularPositions = ['Manager', 'Bartender', 'Trainee'];
-
-            // Check if user is trying to register an admin position
-            if (adminPositions.includes(position)) {
-                // Only these codes can create admin users
-                const adminOnlyCodes = ['MANAGER2025', 'DECADESADMIN'];
-
-                if (!adminOnlyCodes.includes(code)) {
-                    throw new Error('Administrative positions require manager authorization codes. Please use MANAGER2025 or DECADESADMIN.');
+                // Basic validation
+                if (!name || !email || !position || !code || !password || !confirmPassword) {
+                    throw new Error('Please fill in all fields');
                 }
 
-                // Additional security: Check if any admin already exists
+                if (password !== confirmPassword) {
+                    throw new Error('Passwords do not match');
+                }
+
+                const strengthError = validatePasswordStrength(password);
+                if (strengthError) {
+                    throw new Error(strengthError);
+                }
+
+                if (!APPROVED_CODES.includes(code)) {
+                    throw new Error('Invalid registration code. Please contact your manager.');
+                }
+
+                // === ADMIN REGISTRATION SAFEGUARDS ===
+                const adminPositions = ['Admin'];
+                const regularPositions = ['Bartender'];
+
+                // Check if user is trying to register an admin position
+                if (adminPositions.includes(position)) {
+                    // Only these codes can create admin users
+                    const adminOnlyCodes = ['DECADESADMIN'];
+
+                    if (!adminOnlyCodes.includes(code)) {
+                        throw new Error('Administrative positions require manager authorization codes. Please use MANAGER2025 or DECADESADMIN.');
+                    }
+
+                    // REMOVED: The restriction that prevents multiple admins
+                    // Now multiple users can register as admin with the correct codes
+                }
+
+                // Prevent regular codes from creating admin positions
+                if (adminPositions.includes(position)) {
+                    const regularCodes = ['BARSTAFF2025'];
+                    if (regularCodes.includes(code)) {
+                        throw new Error('This registration code cannot be used for administrative positions. Please use a manager authorization code.');
+                    }
+                }
+                // === END SAFEGUARDS ===
+
                 const users = getUserDatabase();
-                const existingAdmins = Object.values(users).filter(user =>
-                    adminPositions.includes(user.position)
-                );
 
-                if (existingAdmins.length > 0) {
-                    throw new Error('Administrative account already exists. Please contact the current manager for access.');
+                // Check if user already exists
+                if (users[email]) {
+                    throw new Error('This email is already registered.');
                 }
+
+                // Create new user
+                users[email] = {
+                    name: name,
+                    email: email,
+                    position: position,
+                    status: 'active',
+                    registeredDate: new Date().toISOString(),
+                    progress: 0,
+                    acknowledged: false,
+                    passwordHash: hashPassword(password),
+                    loginCount: 0,
+                    lastActive: new Date().toISOString()
+                };
+
+                saveUserDatabase(users);
+                return users[email];
             }
 
-            // Prevent regular codes from creating admin positions
-            if (adminPositions.includes(position)) {
-                const regularCodes = ['BARSTAFF2025'];
-                if (regularCodes.includes(code)) {
-                    throw new Error('This registration code cannot be used for administrative positions. Please use a manager authorization code.');
-                }
-            }
-            // === END SAFEGUARDS ===
-
-            const users = getUserDatabase();
-
-            // Check if user already exists
-            if (users[email]) {
-                throw new Error('This email is already registered.');
-            }
-
-            // Create new user
-            users[email] = {
-                name: name,
-                email: email,
-                position: position,
-                status: 'active',
-                registeredDate: new Date().toISOString(),
-                progress: 0,
-                acknowledged: false,
-                passwordHash: hashPassword(password),
-                loginCount: 0,
-                lastActive: new Date().toISOString()
-            };
-
-            saveUserDatabase(users);
-            return users[email];
-        }
-
+        
         // ========== MODAL FUNCTIONS ==========
         function closeAllModals() {
             document.querySelectorAll('.modal').forEach(modal => {
